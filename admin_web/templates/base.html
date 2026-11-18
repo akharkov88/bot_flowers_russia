@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Цветы по русски — Админ-панель{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=6">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Цветы по русски</div>
+        <div class="nav-links">
+            <a href="/" class="{{ 'active' if request.path == '/' }}>Дашборд</a>
+            <a href="/orders" class="{{ 'active' if '/orders' in request.path and 'order_detail' not in request.path }}">Заказы</a>
+            <a href="/products" class="{{ 'active' if '/products' in request.path and 'product_form' not in request.path }}">Товары</a>
+            <a href="/categories" class="{{ 'active' if '/categories' in request.path and 'category_form' not in request.path }}">Категории</a>
+            <a href="/customers" class="{{ 'active' if '/customers' in request.path and 'customer_detail' not in request.path }}">Клиенты</a>
+            <a href="/posts" class="{{ 'active' if '/posts' in request.path }}">Посты</a>
+            <a href="/stats">Статистика</a>
+            <a href="/logout">Выход</a>
+        </div>
+        <div class="nav-right">
+            <a href="/notifications" class="notification-bell {{ 'active' if '/notifications' in request.path }}">
+                <span class="bell-icon">🔔</span>
+                <span class="notification-count" id="notificationCount">0</span>
+            </a>
+        </div>
+    </nav>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    <script src="/static/js/notifications.js"></script>
+</body>
+</html>

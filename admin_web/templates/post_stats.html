@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Статистика поста #{{ post.id }}{% endblock %}
+{% block content %}
+<a href="/posts" class="btn btn-secondary">← Назад к постам</a>
+
+<h1>📊 Статистика поста #{{ post.id }}</h1>
+
+<div class="card">
+    <h2>{{ post.title }}</h2>
+    <p style="margin-top: 0.5rem;">
+        <strong>Статус:</strong> <span class="badge badge-{{ post.status }}">{{ status_labels.get(post.status, post.status) if status_labels else post.status }}</span>
+        &nbsp;&nbsp;
+        <strong>Тип:</strong> {{ '⏰ Запланирован' if post.send_type == 'scheduled' else '⚡ Мгновенный' }}
+    </p>
+    {% if post.sent_at %}
+    <p><strong>Отправлен:</strong> {{ post.sent_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+    {% endif %}
+</div>
+
+{% if stats %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">📤</div>
+        <div class="stat-value">{{ stats.total_sent }}</div>
+        <div class="stat-label">Отправлено</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">❌</div>
+        <div class="stat-value">{{ stats.total_failed }}</div>
+        <div class="stat-label">Ошибок</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-value">{{ stats.total_pending }}</div>
+        <div class="stat-label">Ожидает</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-value">
+            {% set total = stats.total_sent + stats.total_failed %}
+            {% if total > 0 %}
+                {{ "%.0f"|format((stats.total_sent / total) * 100) }}%
+            {% else %}
+                0%
+            {% endif %}
+        </div>
+        <div class="stat-label">Успех</div>
+    </div>
+</div>
+{% endif %}
+
+<h2>Получатели</h2>
+{% if recipients %}
+<div class="table-wrapper">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Telegram ID</th>
+                <th>Статус</th>
+                <th>Время отправки</th>
+                <th>Ошибка</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for recipient in recipients %}
+            <tr>
+                <td>{{ recipient.id }}</td>
+                <td>{{ recipient.telegram_id }}</td>
+                <td><span class="badge badge-{{ recipient.status }}">{{ status_labels.get(recipient.status, recipient.status) }}</span></td>
+                <td>{{ recipient.sent_at.strftime('%d.%m.%Y %H:%M:%S') if recipient.sent_at else '—' }}</td>
+                <td>{% if recipient.error_message %}{{ recipient.error_message[:50] }}{% if recipient.error_message|length > 50 %}...{% endif %}{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p style="color: var(--text-light); margin-top: 1rem;">Получателей пока нет.</p>
+{% endif %}
+{% endblock %}

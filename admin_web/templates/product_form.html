@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Редактирование' if product else 'Добавление' }} товара{% endblock %}
+{% block content %}
+<h1>{{ '✏️ Редактирование' if product else '➕ Добавление' }} товара</h1>
+
+<div class="card">
+    <form method="post" action="{{ '/products/add' if not product else '/products/' ~ product.id ~ '/edit' }}" id="productForm" enctype="multipart/form-data">
+        <input type="hidden" id="image_url" name="image_url" value="">
+        <input type="hidden" id="pending_images" name="images" value="">
+
+        <div class="form-group">
+            <label for="name">Название</label>
+            <input type="text" id="name" name="name" value="{{ product.name if product else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <textarea id="description" name="description" rows="3" required>{{ product.description if product else '' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="price">Цена (₽)</label>
+            <input type="number" id="price" name="price" step="0.01" value="{{ product.price if product else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="category_id">Категория</label>
+            <select id="category_id" name="category_id" required>
+                <option value="">Выберите категорию</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if product and product.category_id == cat.id %}selected{% endif %}>{{ cat.emoji or '📂' }} {{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="composition">Состав</label>
+            <textarea id="composition" name="composition" rows="3">{{ product.composition if product else '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Фотографии товара</label>
+            <div id="imagePreview" style="margin-bottom: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">
+                {% if product and product.images %}
+                {% for img in product.images %}
+                <div style="position: relative;">
+                    <img src="{{ img.image_url }}" style="width: 100%; height: 140px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                    <button type="button" onclick="deleteImage({{ product.id }}, {{ img.id }})" style="position: absolute; top: 6px; right: 6px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 14px; line-height: 1;">✕</button>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+            <input type="file" id="image" name="image" accept="image/*" multiple style="margin-top: 10px;">
+            <small style="color: var(--text-light);">JPG, PNG, WebP (можно выбрать несколько)</small>
+        </div>
+
+        <div class="form-group">
+            <label for="quantity">Количество единиц на складе</label>
+            <input type="number" id="quantity" name="quantity" value="{{ product.quantity if product else 0 }}" min="0" required>
+        </div>
+
+        {% if product %}
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="is_active" value="true" {% if product.is_active %}checked{% endif %}>
+                Активен
+            </label>
+        </div>
+        {% endif %}
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+            <button type="submit" class="btn btn-primary">{{ 'Сохранить' if product else 'Добавить' }}</button>
+            <a href="/products" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<script>
+async function deleteImage(productId, imageId) {
+    if (!confirm('Удалить изображение?')) return;
+    try {
+        const formData = new FormData();
+        const response = await fetch(`/products/${productId}/delete-image/${imageId}`, {
+            method: 'POST',
+        });
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Ошибка удаления изображения');
+        }
+    } catch (err) {
+        alert('Ошибка: ' + err.message);
+    }
+}
+
+let pendingImages = [];
+let pendingElements = [];
+
+document.getElementById('image').addEventListener('change', async function(e) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const productId = '{{ product.id if product else "" }}';
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append('image', file);
+
+        let actionUrl;
+        if (productId) {
+            actionUrl = `/products/${productId}/add-image`;
+        } else {
+            actionUrl = '/products/upload-image';
+        }
+
+        try {
+            const response = await fetch(actionUrl, {
+                method: 'POST',
+                body: formData
+            });
+            if (response.ok) {
+                const data = await response.json();
+                const imageUrl = data.image_url || data;
+                if (typeof imageUrl === 'string') {
+                    pendingImages.push(imageUrl);
+                    const preview = document.getElementById('imagePreview');
+                    const div = document.createElement('div');
+                    div.style.cssText = 'position: relative;';
+                    const idx = pendingImages.length - 1;
+                    div.setAttribute('data-idx', idx);
+                    div.innerHTML = `
+                        <img src="${imageUrl}" style="width: 100%; height: 140px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                        <button type="button" onclick="deletePendingImage(${idx})" style="position: absolute; top: 6px; right: 6px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 14px; line-height: 1;">✕</button>
+                    `;
+                    preview.appendChild(div);
+                    pendingElements.push(div);
+                }
+            } else {
+                alert('Ошибка загрузки изображения: ' + await response.text());
+            }
+        } catch (err) {
+            alert('Ошибка загрузки: ' + err.message);
+        }
+    }
+    e.target.value = '';
+});
+
+function deletePendingImage(idx) {
+    if (!confirm('Удалить фото?')) return;
+    pendingImages.splice(idx, 1);
+    if (pendingElements[idx]) {
+        pendingElements[idx].remove();
+        pendingElements.splice(idx, 1);
+        // Re-index remaining elements
+        const preview = document.getElementById('imagePreview');
+        preview.querySelectorAll('div[data-idx]').forEach((el, i) => {
+            el.setAttribute('data-idx', i);
+        });
+    }
+}
+
+// Store pending images before form submit
+document.getElementById('productForm').addEventListener('submit', function(e) {
+    const hiddenInput = document.getElementById('image_url');
+    const imagesInput = document.getElementById('pending_images');
+    if (pendingImages.length > 0) {
+        hiddenInput.value = pendingImages[0];
+        imagesInput.value = JSON.stringify(pendingImages);
+    }
+});
+
+// Also clear pending images on cancel
+document.querySelector('a[href="/products"]').addEventListener('click', function() {
+    pendingImages = [];
+});
+</script>
+{% endblock %}

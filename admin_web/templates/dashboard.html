@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Дашборд — Цветы по русски{% endblock %}
+{% block content %}
+<h1>Дашборд</h1>
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-value">{{ total_orders }}</div>
+        <div class="stat-label">Всего заказов</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value">{{ "%.0f"|format(revenue) }} ₽</div>
+        <div class="stat-label">Выручка</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-label">Пользователей</div>
+    </div>
+</div>
+
+<h2>Все заказы</h2>
+{% if recent_orders %}
+<div class="table-wrapper">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Клиент</th>
+                <th>Дата заказа</th>
+                <th>Дата доставки</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+                <th>Адрес</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in recent_orders %}
+            <tr>
+                <td><a href="/orders/{{ order.id }}">#{{ order.id }}</a></td>
+                <td>{{ (order.user.first_name if order.user else '—') }} {{ (order.user.last_name if order.user else '') }}</td>
+                <td>{{ (order.order_date or order.created_at.date()).strftime('%d.%m.%Y') }} {{ order.created_at.strftime('%H:%M') }}</td>
+                <td>{{ (order.delivery_date.strftime('%d.%m.%Y') if order.delivery_date else '—') + (' ' + order.delivery_time.strftime('%H:%M') if order.delivery_date and order.delivery_time else '') }}</td>
+                <td>{{ "%.0f"|format(order.total_price) }} ₽</td>
+                <td><span class="badge badge-{{ order.status }}">{{ status_labels.get(order.status, order.status) if status_labels else order.status }}</span></td>
+                <td>{{ order.delivery_address[:30] }}...</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p style="color: var(--text-light); margin-top: 1rem;">Заказов пока нет.</p>
+{% endif %}
+{% endblock %}

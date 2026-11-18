@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Заказ #{{ order.id }}{% endblock %}
+{% block content %}
+<a href="/orders" class="btn btn-secondary">← Назад к заказам</a>
+
+<h1>Заказ #{{ order.id }}</h1>
+
+<div class="card">
+    <h2>Информация о заказе</h2>
+    <p><strong>Статус:</strong> <span class="badge badge-{{ order.status }}">{{ order.status }}</span></p>
+    <p><strong>Клиент:</strong> {{ user.first_name }} {{ user.last_name if user else '—' }}</p>
+    <p><strong>Сумма:</strong> {{ "%.0f"|format(order.total_price) }} ₽</p>
+    <p><strong>Дата заказа:</strong> {{ (order.order_date or order.created_at.date()).strftime('%d.%m.%Y') }} {{ order.created_at.strftime('%H:%M') }}</p>
+</div>
+
+<div class="card">
+    <h2>Состав заказа</h2>
+    {% if order.is_custom %}
+    <p><strong>✨ Индивидуальный заказ:</strong></p>
+    <p style="white-space: pre-wrap;">{{ order.custom_description }}</p>
+    {% if order.comment %}
+    <p><strong>Комментарий:</strong> {{ order.comment }}</p>
+    {% endif %}
+    {% else %}
+    <div class="table-wrapper" style="margin-top: 0.75rem;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Товар</th>
+                    <th>Кол-во</th>
+                    <th>Цена</th>
+                    <th>Итого</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.product.name if item.product else '—' }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ "%.0f"|format(item.price) }} ₽</td>
+                    <td>{{ "%.0f"|format(item.price * item.quantity) }} ₽</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Доставка</h2>
+    {% if not order.is_custom %}
+    <p><strong>Адрес:</strong> {{ order.delivery_address }}</p>
+    {% endif %}
+    {% if order.delivery_date %}
+    <p><strong>Дата доставки:</strong> {{ order.delivery_date.strftime('%d.%m.%Y') }}{% if order.delivery_time %} {{ order.delivery_time.strftime('%H:%M') }}{% endif %}</p>
+    {% endif %}
+    <p><strong>Телефон:</strong> {{ order.phone }}</p>
+    {% if order.comment and not order.is_custom %}
+    <p><strong>Комментарий:</strong> {{ order.comment }}</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Редактировать заказ</h2>
+    <form method="post" action="/orders/{{ order.id }}/edit" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem;">
+        <div class="form-group">
+            <label for="delivery_address">Адрес доставки</label>
+            <input type="text" id="delivery_address" name="delivery_address" class="form-control" value="{{ order.delivery_address or '' }}" placeholder="Введите адрес">
+        </div>
+        <div class="form-group">
+            <label for="delivery_date">Дата доставки (ДД.ММ.ГГГГ)</label>
+            <input type="text" id="delivery_date" name="delivery_date" class="form-control" value="{{ order.delivery_date.strftime('%d.%m.%Y') if order.delivery_date else '' }}" placeholder="Например: 15.11.2026">
+        </div>
+        <div class="form-group">
+            <label for="delivery_time">Время доставки (ЧЧ:ММ)</label>
+            <input type="text" id="delivery_time" name="delivery_time" class="form-control" value="{{ order.delivery_time.strftime('%H:%M') if order.delivery_time else '' }}" placeholder="Например: 14:00">
+        </div>
+        <div class="form-group">
+            <label for="phone">Телефон</label>
+            <input type="text" id="phone" name="phone" class="form-control" value="{{ order.phone or '' }}" placeholder="+7 (996) 041-22-27">
+        </div>
+        <div class="form-group">
+            <label for="comment">Комментарий</label>
+            <textarea id="comment" name="comment" class="form-control" rows="3" placeholder="Комментарий к заказу">{{ order.comment or '' }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">💾 Сохранить изменения</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Изменить статус</h2>
+    <form method="post" action="/orders/{{ order.id }}/status" style="display: flex; gap: 0.75rem; align-items: flex-end; margin-top: 0.75rem;">
+        <div class="form-group" style="margin-bottom: 0; flex: 1;">
+            <select name="status">
+                <option value="new" {% if order.status == 'new' %}selected{% endif %}>🆕 Новый</option>
+                <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>⏳ В обработке</option>
+                <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>✅ Подтверждён</option>
+                <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>🚚 Доставлен</option>
+                <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>❌ Отменён</option>
+                <option value="not_connected" {% if order.status == 'not_connected' %}selected{% endif %}>📵 Не дозвонились</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Обновить</button>
+    </form>
+</div>
+{% endblock %}

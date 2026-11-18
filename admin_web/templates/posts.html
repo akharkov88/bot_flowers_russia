@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Посты — Цветы по русски{% endblock %}
+{% block content %}
+<h1>Посты</h1>
+<a href="/posts/create" class="btn btn-primary">➕ Создать пост</a>
+
+<div class="filters" style="margin-top: 1rem;">
+    <a href="/posts" class="btn {% if not status_filter %}btn-primary{% endif %}">Все</a>
+    <a href="/posts?status=draft" class="btn {% if status_filter == 'draft' %}btn-primary{% endif %}">Черновики</a>
+    <a href="/posts?status=scheduled" class="btn {% if status_filter == 'scheduled' %}btn-primary{% endif %}">Запланированные</a>
+    <a href="/posts?status=sending" class="btn {% if status_filter == 'sending' %}btn-primary{% endif %}">Отправка</a>
+    <a href="/posts?status=sent" class="btn {% if status_filter == 'sent' %}btn-primary{% endif %}">Отправленные</a>
+    <a href="/posts?status=failed" class="btn {% if status_filter == 'failed' %}btn-primary{% endif %}">Ошибки</a>
+</div>
+
+{% if posts %}
+<div class="table-wrapper" style="margin-top: 1rem;">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Заголовок</th>
+                <th>Тип</th>
+                <th>Статус</th>
+                <th>Создан</th>
+                <th>Отправлен</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in posts %}
+            <tr>
+                <td>{{ post.id }}</td>
+                <td>{{ post.title[:30] }}{% if post.title|length > 30 %}...{% endif %}</td>
+                <td>
+                    {% if post.send_type == 'scheduled' %}
+                    ⏰ Запланирован
+                    {% else %}
+                    ⚡ Мгновенный
+                    {% endif %}
+                </td>
+                <td><span class="badge badge-{{ post.status }}">{{ status_labels.get(post.status, post.status) }}</span></td>
+                <td>{{ post.created_at.strftime('%d.%m.%Y %H:%M') if post.created_at else '—' }}</td>
+                <td>{{ post.sent_at.strftime('%d.%m.%Y %H:%M') if post.sent_at else '—' }}</td>
+                <td>
+                    <div class="actions">
+                        <a href="/posts/{{ post.id }}/edit" class="btn btn-icon btn-secondary" title="Редактировать">✏️</a>
+                        {% if post.status in ['draft', 'scheduled'] %}
+                        <form method="post" action="/posts/{{ post.id }}/send" style="display: inline;">
+                            <button type="submit" class="btn btn-icon btn-primary" title="Отправить сейчас">📤</button>
+                        </form>
+                        {% endif %}
+                        <a href="/posts/{{ post.id }}/stats" class="btn btn-icon btn-secondary" title="Статистика">📊</a>
+                        <form method="post" action="/posts/{{ post.id }}/delete" style="display: inline;" onsubmit="return confirm('Удалить пост?')">
+                            <button type="submit" class="btn btn-icon btn-danger" title="Удалить">🗑️</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p style="color: var(--text-light); margin-top: 1rem;">Постов пока нет.</p>
+{% endif %}
+{% endblock %}

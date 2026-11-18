@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Товары — Цветы по русски{% endblock %}
+{% block content %}
+<h1>Товары</h1>
+<a href="/products/add" class="btn btn-primary">➕ Добавить товар</a>
+
+{% if products %}
+<div class="table-wrapper">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Название</th>
+                <th>Цена</th>
+                <th>Кол-во</th>
+                <th>Категория</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ "%.0f"|format(product.price) }} ₽</td>
+                <td>
+                    {% if product.quantity > 0 %}
+                        <span style="color: green;">{{ product.quantity }}</span>
+                    {% elif product.quantity == 0 %}
+                        <span style="color: red;">0</span>
+                    {% else %}
+                        <span style="color: gray;">—</span>
+                    {% endif %}
+                </td>
+                <td>{{ product.category.name if product.category else '—' }}</td>
+                <td>
+                    <span class="badge {% if product.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                        {{ 'Активен' if product.is_active else 'Неактивен' }}
+                    </span>
+                </td>
+                <td>
+                    <div class="actions">
+                        <form method="post" action="/products/{{ product.id }}/toggle" style="display: inline;">
+                            <button type="submit" class="btn btn-icon btn-secondary" title="{{ 'Деактивировать' if product.is_active else 'Активировать' }}">
+                                {{ '🟢' if product.is_active else '🔴' }}
+                            </button>
+                        </form>
+                        <a href="/products/{{ product.id }}/edit" class="btn btn-icon btn-secondary" title="Редактировать">✏️</a>
+                        <form method="post" action="/products/{{ product.id }}/delete" style="display: inline;" onsubmit="return confirm('Удалить товар?')">
+                            <button type="submit" class="btn btn-icon btn-danger" title="Удалить">🗑️</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p style="color: var(--text-light); margin-top: 1rem;">Товаров пока нет.</p>
+{% endif %}
+{% endblock %}

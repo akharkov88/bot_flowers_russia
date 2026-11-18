@@ -1,0 +1,51 @@
+Убиваю старый процесс на порту 8001 (PID: 8950
+9750)...
+🌸 Запуск 'Цветы по русски'...
+Бот: Telegram polling
+Веб-панель: http://0.0.0.0:8001
+2026-11-17 15:57:46,806 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-17 15:57:46,838 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-17 15:57:46,838 [INFO] - bot_russia_flowers - Bot session created successfully
+✅ All routers registered
+2026-11-17 15:57:46,845 [INFO] - bot_russia_flowers - Database initialized
+2026-11-17 15:57:46,845 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-17 15:57:46,845 [INFO] - aiogram.dispatcher - Start polling
+INFO:     Started server process [9985]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+2026-11-17 15:57:47,648 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+INFO:     127.0.0.1:57906 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57906 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44166 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36738 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48772 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37058 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51352 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55416 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55416 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46208 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57250 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50706 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36664 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36090 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39688 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39688 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38692 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54978 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43156 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54418 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45632 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40540 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40540 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43884 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37782 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49494 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49422 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37092 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52142 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52142 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49614 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35698 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54064 - "GET /api/notifications/unread HTTP/1.1" 200 OK
+run.sh: строка 19:  9985 Убито              python -m bot.main

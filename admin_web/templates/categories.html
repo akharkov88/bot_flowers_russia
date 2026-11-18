@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Категории — Цветы по русски{% endblock %}
+{% block content %}
+<h1>Категории</h1>
+<p style="color: var(--text-light); margin-bottom: 1rem;">Управление категориями товаров. Перетаскивайте строки для изменения порядка.</p>
+
+<a href="/categories/add" class="btn btn-primary" style="margin-bottom: 1.25rem;">➕ Добавить категорию</a>
+
+<button id="save-order-btn" class="btn btn-primary" disabled style="margin-bottom: 1rem;" onclick="saveOrder()">💾 Сохранить порядок</button>
+
+{% if categories %}
+<div class="table-wrapper">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Название</th>
+                <th>Изображение</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody id="categories-tbody">
+            {% for cat in categories %}
+            <tr class="category-row" draggable="true" data-category-id="{{ cat.id }}">
+                <td>{{ cat.id }}</td>
+                <td style="font-size: 22px;">{{ cat.emoji or '📂' }} {{ cat.name }}</td>
+                <td>
+                    {% if cat.image_url %}
+                    <img src="{{ cat.image_url }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: var(--radius-sm);">
+                    {% else %}
+                    —
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge {% if cat.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                        {{ 'Активна' if cat.is_active else 'Неактивна' }}
+                    </span>
+                </td>
+                <td>
+                    <div class="actions">
+                        <form method="post" action="/categories/{{ cat.id }}/toggle" style="display: inline;">
+                            <button type="submit" class="btn btn-icon btn-secondary" title="{{ 'Деактивировать' if cat.is_active else 'Активировать' }}">
+                                {{ '🟢' if cat.is_active else '🔴' }}
+                            </button>
+                        </form>
+                        <a href="/categories/{{ cat.id }}/edit" class="btn btn-icon btn-secondary" title="Редактировать">✏️</a>
+                        <form method="post" action="/categories/{{ cat.id }}/delete" style="display: inline;" onsubmit="return confirm('Удалить категорию?')">
+                            <button type="submit" class="btn btn-icon btn-danger" title="Удалить">🗑️</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p style="color: var(--text-light); margin-top: 1rem;">Категорий пока нет.</p>
+{% endif %}
+
+<script>
+let draggedRow = null;
+
+document.querySelectorAll('.category-row').forEach(row => {
+    row.addEventListener('dragstart', function(e) {
+        draggedRow = this;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', '');
+        this.style.opacity = '0.5';
+    });
+
+    row.addEventListener('dragend', function() {
+        this.style.opacity = '1';
+        draggedRow = null;
+        // Remove hover styles from all rows
+        document.querySelectorAll('.category-row').forEach(r => {
+            r.style.borderTop = '';
+            r.style.borderBottom = '';
+        });
+    });
+
+    row.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+
+        if (draggedRow && draggedRow !== this) {
+            const rect = this.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            if (e.clientY < midY) {
+                this.style.borderTop = '2px solid var(--primary)';
+                this.style.borderBottom = '';
+            } else {
+                this.style.borderTop = '';
+                this.style.borderBottom = '2px solid var(--primary)';
+            }
+        }
+    });
+
+    row.addEventListener('dragleave', function() {
+        this.style.borderTop = '';
+        this.style.borderBottom = '';
+    });
+
+    row.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderTop = '';
+        this.style.borderBottom = '';
+
+        if (draggedRow && draggedRow !== this) {
+            const rows = [...document.querySelectorAll('.category-row')];
+            const draggedIdx = rows.indexOf(draggedRow);
+            const droppedIdx = rows.indexOf(this);
+            if (draggedIdx < droppedIdx) {
+                this.after(draggedRow);
+            } else {
+                this.before(draggedRow);
+            }
+            document.getElementById('save-order-btn').disabled = false;
+        }
+    });
+});
+
+function saveOrder() {
+    const ids = [...document.querySelectorAll('.category-row')]
+        .map(row => row.dataset.categoryId);
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/categories/reorder';
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'ids';
+    input.value = ids.join(',');
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+{% endblock %}

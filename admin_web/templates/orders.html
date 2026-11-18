@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Заказы — Цветы по русски{% endblock %}
+{% block content %}
+<h1>Заказы</h1>
+<div class="filters">
+    <a href="/orders" class="btn {% if not status_filter %}btn-primary{% endif %}">Все</a>
+    <a href="/orders?status=new" class="btn {% if status_filter == 'new' %}btn-primary{% endif %}">Новые</a>
+    <a href="/orders?status=processing" class="btn {% if status_filter == 'processing' %}btn-primary{% endif %}">В обработке</a>
+    <a href="/orders?status=confirmed" class="btn {% if status_filter == 'confirmed' %}btn-primary{% endif %}">Подтверждённые</a>
+    <a href="/orders?status=delivered" class="btn {% if status_filter == 'delivered' %}btn-primary{% endif %}">Доставленные</a>
+    <a href="/orders?status=not_connected" class="btn {% if status_filter == 'not_connected' %}btn-primary{% endif %}">Не дозвонились</a>
+</div>
+
+{% if orders %}
+<div class="table-wrapper">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Дата заказа</th>
+                <th>Дата доставки</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+                <th>Адрес</th>
+                <th>Телефон</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>
+                    <a href="/orders/{{ order.id }}">#{{ order.id }}</a>
+                    {% if order.is_custom %}
+                    <span class="badge badge-info" style="margin-left: 4px;">✨ Инд.</span>
+                    {% endif %}
+                </td>
+                <td>{{ (order.order_date or order.created_at.date()).strftime('%d.%m.%Y') }} {{ order.created_at.strftime('%H:%M') }}</td>
+                <td>{{ (order.delivery_date.strftime('%d.%m.%Y') if order.delivery_date else '—') + (' ' + order.delivery_time.strftime('%H:%M') if order.delivery_date and order.delivery_time else '') }}</td>
+                <td>{{ "%.0f"|format(order.total_price) }} ₽</td>
+                <td><span class="badge badge-{{ order.status }}">{{ status_labels.get(order.status, order.status) }}</span></td>
+                <td>{{ order.delivery_address[:30] if not order.is_custom else '—' }}</td>
+                <td>{{ order.phone }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p style="color: var(--text-light); margin-top: 1rem;">Заказов не найдено.</p>
+{% endif %}
+{% endblock %}

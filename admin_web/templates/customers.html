@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Клиенты — Цветы по русски{% endblock %}
+{% block content %}
+<h1>Клиенты</h1>
+
+<div class="filters">
+    <form method="get" style="display:flex;gap:0.5rem;align-items:center;">
+        <input type="text" name="search" placeholder="Поиск по имени/ID..." value="{{ search or '' }}" style="padding:0.5rem 0.85rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.875rem;background:var(--bg-white);color:var(--text);font-family:'Inter',sans-serif;min-width:220px;" class="form-control">
+        <button type="submit" class="btn btn-primary">🔍 Поиск</button>
+        {% if search %}<a href="/customers" class="btn btn-secondary">✕ Сброс</a>{% endif %}
+    </form>
+</div>
+
+{% if users %}
+<div class="table-wrapper customers-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Telegram ID</th>
+                <th>Имя</th>
+                <th>Телефон</th>
+                <th>Статус бота</th>
+                <th>Заказы</th>
+                <th>Сумма</th>
+                <th>Корзина</th>
+                <th>Брошенные</th>
+                <th>Регистрация</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            {% set stats = user_stats.get(user.id, {}) %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.telegram_id }}</td>
+                <td>{{ user.first_name or '—' }} {{ user.last_name or '—' }}</td>
+                <td>{{ user.phone or '—' }}</td>
+                <td>
+                    {% if user.is_blocked %}
+                    <span style="color: var(--danger); font-weight: 600; font-size: 0.85rem;">🚫 Заблокирован админом</span>
+                    {% elif user.user_blocked_bot %}
+                    <span style="color: var(--warning, #f39c12); font-weight: 600; font-size: 0.85rem;">📵 Заблокировал бота</span>
+                    {% else %}
+                    <span style="color: var(--success); font-weight: 600; font-size: 0.85rem;">✅ Активен</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ stats.get('order_count', 0) }}
+                    {% if stats.get('unfinished_count', 0) > 0 %}
+                    <span style="color: var(--warning, #f39c12); font-weight: 600; font-size: 0.85rem;" title="Не завершённых заказов: {{ stats.get('unfinished_count', 0) }}">⚠️{{ stats.get('unfinished_count', 0) }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ "%.0f"|format(stats.get('total_spent', 0)) }} ₽</td>
+                <td>
+                    {% set active = stats.get('active_cart') %}
+                    {% if active %}
+                    <span style="color: var(--success); font-weight: 600; font-size: 0.85rem;">{{ "%.0f"|format(active.total_price) }} ₽</span>
+                    {% else %}
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% set abandoned = stats.get('abandoned_count', 0) %}
+                    {% if abandoned > 0 %}
+                    <span style="color: var(--warning, #f39c12); font-weight: 600; font-size: 0.85rem;">🗑️{{ abandoned }}</span>
+                    {% else %}
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">—</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.created_at.strftime('%d.%m.%Y') if user.created_at else '—' }}</td>
+                <td>
+                    <div class="actions">
+                        <a href="/customers/{{ user.id }}" class="profile-icon-btn" title="Профиль">👤</a>
+                        <a href="/customers/{{ user.id }}/chat" class="chat-icon-btn" title="Чат">💬</a>
+                        {% if user.is_blocked %}
+                        <form method="post" action="/customers/{{ user.id }}/unban" style="display:inline;">
+                            <button type="submit" class="btn-icon-only btn-unban" title="Разблокировать">♻️</button>
+                        </form>
+                        {% else %}
+                        <form method="post" action="/customers/{{ user.id }}/ban" style="display:inline;">
+                            <button type="submit" class="btn-icon-only btn-ban" title="Заблокировать">🚫</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p style="color: var(--text-light); margin-top: 1rem;">Клиентов пока нет.</p>
+{% endif %}
+{% endblock %}

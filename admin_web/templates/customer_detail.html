@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}{{ user.first_name or 'Клиент' }} {{ user.last_name or '' }}{% endblock %}
+{% block content %}
+<a href="/customers" class="btn btn-secondary">← Назад к клиентам</a>
+
+<h1>👤 {{ user.first_name or 'Клиент' }} {{ user.last_name or '' }}</h1>
+
+<div class="card">
+    <h2>Информация</h2>
+    <p><strong>Telegram ID:</strong> {{ user.telegram_id }}</p>
+    {% if user.username %}<p><strong>Username:</strong> @{{ user.username }}</p>{% endif %}
+    {% if user.phone %}<p><strong>Телефон:</strong> {{ user.phone }}</p>{% endif %}
+    <p><strong>Статус:</strong> {% if user.is_blocked %}<span style="color: var(--danger); font-weight: 600;">🚫 Заблокирован админом</span>{% elif user.user_blocked_bot %}<span style="color: var(--warning, #f39c12); font-weight: 600;">📵 Заблокировал бота</span>{% else %}<span style="color: var(--success); font-weight: 600;">✅ Активен</span>{% endif %}</p>
+    <p><strong>Регистрация:</strong> {{ user.created_at.strftime('%d.%m.%Y %H:%M') if user.created_at else '—' }}</p>
+    {% if user.is_blocked %}
+    <form method="post" action="/customers/{{ user.id }}/unban" style="margin-top: 1rem;">
+        <button type="submit" class="btn btn-success">♻️ Разблокировать пользователя</button>
+    </form>
+    {% else %}
+    <form method="post" action="/customers/{{ user.id }}/ban" style="margin-top: 1rem;">
+        <button type="submit" class="btn btn-danger">🚫 Заблокировать пользователя</button>
+    </form>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Заказы ({{ orders|length }})</h2>
+    {% if orders %}
+    <div class="table-wrapper" style="margin-top: 0.75rem;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Дата</th>
+                    <th>Сумма</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td><a href="/orders/{{ order.id }}">#{{ order.id }}</a></td>
+                    <td>{{ order.created_at.strftime('%d.%m.%Y %H:%M') if order.created_at else '—' }}</td>
+                    <td>{{ "%.0f"|format(order.total_price) }} ₽</td>
+                    <td><span class="badge badge-{{ order.status }}">{{ status_labels.get(order.status, order.status) if status_labels else order.status }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-light); margin-top: 0.5rem;">Заказов нет</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Корзины ({{ carts|length }})</h2>
+    {% if carts %}
+    <div class="table-wrapper" style="margin-top: 0.75rem;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Создана</th>
+                    <th>Обновлена</th>
+                    <th>Товары</th>
+                    <th>Сумма</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cart in carts %}
+                <tr>
+                    <td>{{ cart.created_at.strftime('%d.%m.%Y %H:%M') if cart.created_at else '—' }}</td>
+                    <td>{{ cart.updated_at.strftime('%d.%m.%Y %H:%M') if cart.updated_at else '—' }}</td>
+                    <td>{{ cart_items|selectattr('cart.id', 'equalto', cart.id)|list|length }} шт.</td>
+                    <td>{{ "%.0f"|format(cart.total_price) }} ₽</td>
+                    <td>
+                        {% if cart.status == 'active' %}
+                        <span class="badge badge-active">Активна</span>
+                        {% elif cart.status == 'completed' %}
+                        <span class="badge badge-completed">Завершена</span>
+                        {% else %}
+                        <span class="badge badge-inactive">Брошена</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-light); margin-top: 0.5rem;">Корзин нет</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Написать клиенту</h2>
+    <p><a href="/customers/{{ user.id }}/chat" class="btn btn-primary">💬 Открыть чат</a></p>
+</div>
+{% endblock %}

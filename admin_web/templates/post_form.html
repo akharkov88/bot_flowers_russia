@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Редактирование' if post else 'Создание' }} поста{% endblock %}
+{% block content %}
+<h1>{{ '✏️ Редактирование' if post else '➕ Создание' }} поста</h1>
+
+<div class="card">
+    <form method="post" action="{{ '/posts/create' if not post else '/posts/' ~ post.id ~ '/edit' }}" id="postForm">
+        <input type="hidden" id="image_urls" name="image_urls" value="{{ post.images if post and post.images else '' }}">
+
+        <div class="form-group">
+            <label for="title">Заголовок</label>
+            <input type="text" id="title" name="title" value="{{ post.title if post else '' }}" required placeholder="Например: Весенняя коллекция 2026">
+        </div>
+
+        <div class="form-group">
+            <label for="text">Текст поста</label>
+            <textarea id="text" name="text" rows="5" required placeholder="Расскажите о новинках, акциях или событиях...">{{ post.text if post else '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Фотографии поста</label>
+            <div id="imagePreview" style="margin-bottom: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;"></div>
+            <input type="file" id="image" name="image" accept="image/*" style="margin-top: 10px;">
+            <small style="color: var(--text-light);">JPG, PNG, WebP (до 10 фото)</small>
+        </div>
+
+        {% if post and post.images %}
+        <script>
+            // Initialize image_urls with existing images
+            document.addEventListener('DOMContentLoaded', function() {
+                const images = JSON.parse('{{ post.images|safe }}');
+                if (images && images.length > 0) {
+                    document.getElementById('image_urls').value = JSON.stringify(images);
+                    const preview = document.getElementById('imagePreview');
+                    images.forEach(function(url) {
+                        const div = document.createElement('div');
+                        div.style.cssText = 'position: relative;';
+                        div.innerHTML = `
+                            <img src="${url}" style="width: 100%; height: 140px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                            <button type="button" onclick="removeImage(this)" style="position: absolute; top: 6px; right: 6px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 14px; line-height: 1;">✕</button>
+                        `;
+                        preview.appendChild(div);
+                    });
+                }
+            });
+        </script>
+        {% endif %}
+
+        <div class="form-group">
+            <label>Тип отправки</label>
+            <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="radio" name="send_type" value="instant" {% if not post or post.send_type == 'instant' %}checked{% endif %}>
+                    ⚡ Отправить сейчас
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="radio" name="send_type" value="scheduled" {% if post and post.send_type == 'scheduled' %}checked{% endif %}>
+                    ⏰ Запланировать
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group" id="scheduledAtGroup" style="display: {% if post and post.send_type == 'scheduled' %}block{% else %}none{% endif %};">
+            <label for="scheduled_at">Дата и время отправки</label>
+            <input type="datetime-local" id="scheduled_at" name="scheduled_at" value="{{ post.scheduled_at.strftime('%Y-%m-%dT%H:%M') if post and post.scheduled_at else '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Аудитория</label>
+            <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="radio" name="audience_type" value="all" id="audienceAll" {% if not post or not selected_user_ids %}checked{% endif %} onchange="toggleAudience()">
+                    Всем пользователям
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="radio" name="audience_type" value="selected" id="audienceSelected" {% if selected_user_ids %}checked{% endif %} onchange="toggleAudience()">
+                    Выбрать пользователей
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group" id="selectedUsersGroup" style="display: {% if post and post.audience and '"selected"' in post.audience %}block{% else %}none{% endif %};">
+            <label for="selected_user_ids">Выбранные пользователи (через запятую ID)</label>
+            <input type="text" id="selected_user_ids" name="selected_user_ids" value="{{ selected_user_ids }}" placeholder="1, 5, 10">
+            <small style="color: var(--text-light);">Введите ID пользователей через запятую. Всего пользователей: {{ users|length }}</small>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+            <button type="submit" class="btn btn-primary">{{ 'Сохранить' if post else 'Создать черновик' }}</button>
+            <a href="/posts" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<script>
+// Toggle scheduled at field
+document.querySelectorAll('input[name="send_type"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const group = document.getElementById('scheduledAtGroup');
+        group.style.display = this.value === 'scheduled' ? 'block' : 'none';
+    });
+});
+
+// Toggle audience selection
+function toggleAudience() {
+    const allRadio = document.getElementById('audienceAll');
+    const selectedRadio = document.getElementById('audienceSelected');
+    const group = document.getElementById('selectedUsersGroup');
+    group.style.display = selectedRadio.checked ? 'block' : 'none';
+}
+
+// Image upload
+document.getElementById('image').addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+        const response = await fetch('/posts/upload-image', {
+            method: 'POST',
+            body: formData
+        });
+        if (response.ok) {
+            const filename = await response.text();
+            addImage(filename);
+        } else {
+            alert('Ошибка загрузки изображения');
+        }
+    } catch (err) {
+        alert('Ошибка загрузки: ' + err.message);
+    }
+});
+
+function addImage(url) {
+    const preview = document.getElementById('imagePreview');
+    const div = document.createElement('div');
+    div.style.cssText = 'position: relative;';
+    div.innerHTML = `
+        <img src="${url}" style="width: 100%; height: 140px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <button type="button" onclick="removeImage(this)" style="position: absolute; top: 6px; right: 6px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 14px; line-height: 1;">✕</button>
+    `;
+    preview.appendChild(div);
+    updateImageUrls();
+}
+
+function removeImage(btn) {
+    btn.parentElement.remove();
+    updateImageUrls();
+}
+
+function updateImageUrls() {
+    const images = [];
+    document.querySelectorAll('#imagePreview img').forEach(img => {
+        images.push(img.getAttribute('src'));
+    });
+    document.getElementById('image_urls').value = JSON.stringify(images);
+}
+</script>
+{% endblock %}
