@@ -23,8 +23,8 @@ async def abandon_cart(db_session, user_id):
     cart = result.scalar_one_or_none()
     if cart:
         cart.status = "abandoned"
-        from datetime import datetime, timezone
-        cart.abandoned_at = datetime.now(timezone.utc)
+        from datetime import datetime
+        cart.abandoned_at = datetime.now()
         await db_session.commit()
 
 

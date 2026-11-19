@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from bot.keyboards import pack_cb, unpack_cb, get_categories_keyboard, get_products_keyboard, get_product_detail_keyboard, get_main_keyboard
-from bot.models import Category, Product
+from bot.models import Category, Product, Message as BotMessage, User
 from bot.states import NavigationState, CustomBouquetForm
 from bot.handlers.navigation import (
     push_navigation,
@@ -21,7 +21,24 @@ from bot.handlers.navigation import (
     SCREEN_PRODUCT,
 )
 from bot.utils.logger import logger
+from bot.database import async_session_factory
 import os
+
+
+async def save_outgoing(user_id, text):
+    """Save an outgoing message sent by the bot."""
+    try:
+        async with async_session_factory() as session:
+            msg = BotMessage(
+                user_id=user_id,
+                direction="outgoing",
+                text=text,
+            )
+            session.add(msg)
+            await session.commit()
+            logger.info(f"Saved outgoing message to user {user_id}: {text[:50]}")
+    except Exception as e:
+        logger.error(f"Error saving outgoing message: {e}")
 
 
 async def _get_categories_with_available_products(db_session):
@@ -59,10 +76,20 @@ catalog_router = Router()
 @catalog_router.message(F.text == "🌸 Каталог")
 async def msg_catalog(message: Message, state: FSMContext, db_session):
     try:
+        # Get user from db_session (set by TrackingMiddleware)
+        user_result = await db_session.execute(select(User).where(User.telegram_id == message.from_user.id))
+        user = user_result.scalar_one_or_none()
+        if not user:
+            user = User(telegram_id=message.from_user.id, first_name=message.from_user.first_name, username=message.from_user.username)
+            db_session.add(user)
+            await db_session.commit()
+
         categories = await _get_categories_with_available_products(db_session)
 
         if not categories:
-            await message.answer("🌸 Каталог пока пуст. Загляните позже!")
+            text = "🌸 Каталог пока пуст. Загляните позже!"
+            await save_outgoing(user.id, text)
+            await message.answer(text)
             return
 
         # Инициализируем стек навигации при первом входе в каталог
@@ -77,10 +104,14 @@ async def msg_catalog(message: Message, state: FSMContext, db_session):
             )
             logger.info(f"DEBUG catalog: initialized stack with categories")
         await push_navigation(state, SCREEN_CATEGORIES)
-        await message.answer("🌸 Выберите категорию:", reply_markup=get_categories_keyboard(categories))
+        text2 = "🌸 Выберите категорию:"
+        await save_outgoing(user.id, text2)
+        await message.answer(text2, reply_markup=get_categories_keyboard(categories))
     except Exception as e:
         logger.error(f"Error in msg_catalog: {e}")
-        await message.answer("❌ Произошла ошибка при загрузке каталога.")
+        text_err = "❌ Произошла ошибка при загрузке каталога."
+        await save_outgoing(user.id, text_err)
+        await message.answer(text_err)
 
 
 @catalog_router.callback_query(F.data.startswith('{"t":"cat"'))
@@ -105,6 +136,7 @@ async def cb_handle_catalog(callback: CallbackQuery, bot: Bot, db_session, state
         if not products:
             await callback.answer("В этой категории пока нет товаров")
             await callback.message.answer("🌸 В этой категории пока нет товаров.")
+            await save_outgoing(user.id, "🌸 В этой категории пока нет товаров.")
             return
 
         await push_navigation(state, SCREEN_PRODUCTS, cat_id=cat_id)

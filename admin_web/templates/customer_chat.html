@@ -309,21 +309,19 @@ async function fetchMessages() {
             if (id) currentIds.add(Number(id));
         });
 
-        const newCount = data.messages.length;
+        console.log('fetchMessages: data.messages.length =', data.messages.length, 'currentIds.size =', currentIds.size);
 
         // Only append messages that aren't already in the DOM
-        for (let i = 0; i < newCount; i++) {
+        for (let i = 0; i < data.messages.length; i++) {
             const msg = data.messages[i];
             if (!currentIds.has(msg.id)) {
+                console.log('Adding new message:', msg.id, msg.direction, msg.text);
                 messagesDiv.appendChild(createMessageElement(msg));
+                scrollToBottom();
             }
         }
-
-        if (newCount > currentIds.size) {
-            scrollToBottom();
-        }
     } catch (e) {
-        // Silently fail
+        console.error('fetchMessages error:', e);
     }
 }
 

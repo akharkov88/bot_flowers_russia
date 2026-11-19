@@ -18,7 +18,7 @@ from bot.utils.logger import logger
 
 from sqlalchemy import select, func
 from sqlalchemy.orm import joinedload
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 from admin_web.main import run_admin_web
 from bot.models import User
 
@@ -35,6 +35,9 @@ async def main():
     logger.info("Bot session created successfully")
     
     dp = Dispatcher()
+
+    # Setup outgoing message observer (saves bot replies to DB)
+    # Outgoing messages are now saved directly in handlers via save_outgoing()
 
     # Register middleware
     dp.message.middleware(TrackingMiddleware(admin_ids=settings.admin_ids_list))
@@ -132,7 +135,7 @@ async def main():
         while True:
             try:
                 async with async_session_factory() as session:
-                    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+                    cutoff = datetime.now() - timedelta(hours=24)
                     result = await session.execute(
                         select(Cart).where(
                             Cart.status == "active",
@@ -142,7 +145,7 @@ async def main():
                     old_carts = result.scalars().all()
                     for cart in old_carts:
                         cart.status = "abandoned"
-                        cart.abandoned_at = datetime.now(timezone.utc)
+                        cart.abandoned_at = datetime.now()
                     if old_carts:
                         await session.commit()
                         logger.info(f"Marked {len(old_carts)} carts as abandoned")
@@ -200,7 +203,7 @@ async def main():
             try:
                 async with async_session_factory() as session:
                     # Get posts that need to be sent
-                    now = datetime.now(timezone.utc)
+                    now = datetime.now()
                     result = await session.execute(
                         select(Post)
                         .where(
@@ -360,7 +363,7 @@ async def main():
                                         rec = result.scalar_one_or_none()
                                         if rec:
                                             rec.status = "sent"
-                                            rec.sent_at = datetime.now(timezone.utc)
+                                            rec.sent_at = datetime.now()
                                             await session.commit()
 
                                     # Update stats (recalculate from recipients)
@@ -420,7 +423,7 @@ async def main():
                                     failed_count = result.scalar() or 0
 
                                     post.status = "failed" if failed_count > 0 else "sent"
-                                    post.sent_at = datetime.now(timezone.utc)
+                                    post.sent_at = datetime.now()
                                     await session.commit()
 
                         except Exception as e:

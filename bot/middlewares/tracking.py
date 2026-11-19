@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any, Callable, Dict, List
 
-from aiogram import BaseMiddleware
+from aiogram import BaseMiddleware, Bot, Dispatcher
 from aiogram.types import Message as TgMessage, CallbackQuery
 from sqlalchemy import select
 

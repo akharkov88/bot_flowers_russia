@@ -12,7 +12,7 @@ import os
 import uuid
 import json
 import asyncio
-from datetime import datetime, timezone, date, time, timedelta
+from datetime import datetime, date, time, timedelta, timezone
 
 # MSK timezone (UTC+3)
 MSK = timezone(timedelta(hours=3))
@@ -979,7 +979,7 @@ async def customer_chat_page(request: Request, user_id: int):
                 msg._formatted_callback = format_callback_data(msg.callback_data)
             # Convert created_at to MSK
             if msg.created_at:
-                msg._created_at_msk = msg.created_at.astimezone(MSK)
+                msg._created_at_msk = msg.created_at.replace(tzinfo=MSK)
 
     return HTMLResponse(content=render_template("customer_chat.html", {
         "request": request,
@@ -990,82 +990,88 @@ async def customer_chat_page(request: Request, user_id: int):
 
 @router.post("/customers/{user_id}/chat/send")
 async def send_chat_message(user_id: int, request: Request):
-    async with async_session_factory() as session:
-        result = await session.execute(select(User).where(User.id == user_id))
-        user = result.scalar_one_or_none()
-        if not user:
-            raise HTTPException(status_code=404, detail="Пользователь не найден")
+    try:
+        async with async_session_factory() as session:
+            result = await session.execute(select(User).where(User.id == user_id))
+            user = result.scalar_one_or_none()
+            if not user:
+                raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-        form = await request.form()
-        message = form.get("message") or ""
+            form = await request.form()
+            message = form.get("message") or ""
 
-        # Get all image files using getlist
-        image_files = form.getlist("image")
+            # Get all image files using getlist
+            image_files = form.getlist("image")
 
-        logger.info(f"Chat send for user {user_id}: message={repr(message[:50])}, image_files={len(image_files)}")
-        for i, img in enumerate(image_files):
-            logger.info(f"  Image {i}: filename={img.filename}, size={img.size}")
+            logger.info(f"Chat send for user {user_id}: message={repr(message[:50])}, image_files={len(image_files)}")
+            for i, img in enumerate(image_files):
+                logger.info(f"  Image {i}: filename={img.filename}, size={img.size}")
 
-        text = message.strip() if message else ""
-        image_urls = []
+            text = message.strip() if message else ""
+            image_urls = []
 
-        # Handle image uploads
-        for image in image_files:
-            if image.filename.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
-                ext = os.path.splitext(image.filename)[1]
-                filename = f"chat_{user.id}_{uuid.uuid4().hex}{ext}"
-                filepath = os.path.join(UPLOAD_DIR, filename)
+            # Handle image uploads
+            for image in image_files:
+                if image.filename.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                    ext = os.path.splitext(image.filename)[1]
+                    filename = f"chat_{user.id}_{uuid.uuid4().hex}{ext}"
+                    filepath = os.path.join(UPLOAD_DIR, filename)
 
-                with open(filepath, "wb") as f:
-                    content = await image.read()
-                    f.write(content)
+                    with open(filepath, "wb") as f:
+                        content = await image.read()
+                        f.write(content)
 
-                image_urls.append(f"/static/uploads/{filename}")
+                    image_urls.append(f"/static/uploads/{filename}")
 
-        if not text and not image_urls:
-            return RedirectResponse(url=f"/customers/{user_id}/chat", status_code=302)
+            if not text and not image_urls:
+                return RedirectResponse(url=f"/customers/{user_id}/chat", status_code=302)
 
-        # Create message records for each image
-        for image_url in image_urls:
-            msg = Message(
-                user_id=user.id,
-                direction="outgoing",
-                text=text if len(image_urls) == 1 else None,
-                image_url=image_url,
-            )
-            session.add(msg)
+            # Create message records for each image
+            for image_url in image_urls:
+                msg = Message(
+                    user_id=user.id,
+                    direction="outgoing",
+                    text=text if len(image_urls) == 1 else None,
+                    image_url=image_url,
+                )
+                session.add(msg)
 
-        # If no images, create text-only message
-        if not image_urls and text:
-            msg = Message(
-                user_id=user.id,
-                direction="outgoing",
-                text=text,
-            )
-            session.add(msg)
+            # If no images, create text-only message
+            if not image_urls and text:
+                msg = Message(
+                    user_id=user.id,
+                    direction="outgoing",
+                    text=text,
+                )
+                session.add(msg)
 
-        await session.flush()
+            await session.flush()
+            logger.info(f"Saved outgoing message for user {user_id}: text={repr(text[:50])}")
 
-        # Create notification for bot to send
-        notification_text = text if text else "📷 Фото"
-        notification = Notification(
-            telegram_id=user.telegram_id,
-            text=notification_text,
-            user_id=user.id,
-        )
-        session.add(notification)
-
-        # Create separate notifications for each image
-        for image_url in image_urls:
-            image_notif = Notification(
+            # Create notification for bot to send
+            notification_text = text if text else "📷 Фото"
+            notification = Notification(
                 telegram_id=user.telegram_id,
-                text=text if len(image_urls) == 1 else "📷 Фото",
-                image_url=image_url,
+                text=notification_text,
                 user_id=user.id,
             )
-            session.add(image_notif)
+            session.add(notification)
 
-        await session.commit()
+            # Create separate notifications for each image
+            for image_url in image_urls:
+                image_notif = Notification(
+                    telegram_id=user.telegram_id,
+                    text=text if len(image_urls) == 1 else "📷 Фото",
+                    image_url=image_url,
+                    user_id=user.id,
+                )
+                session.add(image_notif)
+
+            await session.commit()
+            logger.info(f"Committed outgoing message + notification for user {user_id}")
+    except Exception as e:
+        logger.error(f"Error in send_chat_message for user {user_id}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
     return RedirectResponse(url=f"/customers/{user_id}/chat", status_code=302)
 
@@ -1108,7 +1114,7 @@ async def get_chat_messages(user_id: int):
             "image_url": m.image_url,
             "callback_data": m.callback_data,
             "formatted_callback": format_callback_data(m.callback_data) if m.callback_data else "",
-            "created_at": m.created_at.astimezone(MSK).strftime("%d.%m.%Y %H:%M:%S") if m.created_at else "",
+            "created_at": m.created_at.replace(tzinfo=MSK).strftime("%d.%m.%Y %H:%M:%S") if m.created_at else "",
         }
         for m in messages
     ]
@@ -1192,7 +1198,7 @@ async def post_create_submit(
     is_active: bool = FastAPIForm(True),
 ):
     import json
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     # Parse images
     images = json.loads(image_urls) if image_urls else []
@@ -1275,7 +1281,7 @@ async def post_edit_submit(
     selected_user_ids: str = FastAPIForm(""),
 ):
     import json
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     async with async_session_factory() as session:
         result = await session.execute(select(Post).where(Post.id == post_id))
@@ -1512,7 +1518,7 @@ async def process_post_sending(post_id: int):
                     rec = result.scalar_one_or_none()
                     if rec:
                         rec.status = "sent"
-                        rec.sent_at = datetime.now(timezone.utc)
+                        rec.sent_at = datetime.now()
                         await session.commit()
 
                 # Update stats
@@ -1562,7 +1568,7 @@ async def process_post_sending(post_id: int):
                 failed_count = result.scalar() or 0
 
                 post.status = "failed" if failed_count > 0 else "sent"
-                post.sent_at = datetime.now(timezone.utc)
+                post.sent_at = datetime.now()
                 await session.commit()
 
     except Exception as e:

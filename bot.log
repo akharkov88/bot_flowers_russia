@@ -22288,3 +22288,1280 @@ photo.is-instance[InputFile]
 2026-11-18 10:57:47,277 [INFO] - aiogram.dispatcher - Start polling
 2026-11-18 10:57:47,959 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
 2026-11-18 10:58:48,446 [INFO] - bot_russia_flowers - Photo (file) sent successfully to 622070505
+2026-11-18 11:07:17,970 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 11:07:17,971 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 11:07:24,042 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 11:07:24,042 [WARNING] - aiogram.dispatcher - Sleep for 1.141162 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-18 11:07:30,247 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 11:07:30,247 [WARNING] - aiogram.dispatcher - Sleep for 1.599292 seconds and try again... (tryings = 2, bot id = 9239151532)
+2026-11-18 11:08:31,853 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 11:08:31,854 [WARNING] - aiogram.dispatcher - Sleep for 2.016164 seconds and try again... (tryings = 3, bot id = 9239151532)
+2026-11-18 11:08:44,360 [INFO] - aiogram.dispatcher - Connection established (tryings = 4, bot id = 9239151532)
+2026-11-18 11:12:17,197 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 11:12:17,198 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 11:12:28,707 [INFO] - aiogram.dispatcher - Connection established (tryings = 1, bot id = 9239151532)
+2026-11-18 11:27:27,696 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 11:27:27,696 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 11:27:39,216 [INFO] - aiogram.dispatcher - Connection established (tryings = 1, bot id = 9239151532)
+2026-11-18 11:31:35,897 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 11:31:35,898 [INFO] - aiogram.dispatcher - Polling stopped for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 11:31:35,898 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 11:31:36,054 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 11:31:36,151 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-18 12:15:38,105 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 12:15:38,132 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:07:56,260 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:07:56,287 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:07:56,287 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:07:56,308 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:07:56,308 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:07:56,308 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:07:56,353 [WARNING] - bot_russia_flowers - Error in abandoned carts processor: (sqlalchemy.dialects.postgresql.asyncpg.Error) invalid input for query argument $2: datetime.datetime(2026, 11, 17, 11, 7, 5... (can't subtract offset-naive and offset-aware datetimes)
+[SQL: SELECT carts.id, carts.user_id, carts.telegram_id, carts.data, carts.total_price, carts.status, carts.created_at, carts.updated_at, carts.abandoned_at 
+FROM carts 
+WHERE carts.status = $1::VARCHAR AND carts.updated_at < $2::TIMESTAMP WITHOUT TIME ZONE]
+[parameters: ('active', datetime.datetime(2026, 11, 17, 11, 7, 56, 335683, tzinfo=datetime.timezone.utc))]
+(Background on this error at: https://sqlalche.me/e/21/dbapi)
+2026-11-18 14:07:57,055 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:14:12,638 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 14:14:12,639 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 14:15:13,646 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 14:15:13,647 [WARNING] - aiogram.dispatcher - Sleep for 1.307874 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-18 14:15:17,255 [WARNING] - aiogram.dispatcher - Received SIGTERM signal
+2026-11-18 14:15:17,255 [INFO] - aiogram.dispatcher - Polling stopped for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:15:17,255 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 14:15:17,386 [WARNING] - aiogram.dispatcher - Received SIGTERM signal
+2026-11-18 14:15:17,506 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-18 14:17:39,101 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:17:39,129 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:17:39,129 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:17:39,146 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:17:39,147 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:17:39,147 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:17:40,883 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:21:50,656 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:21:50,685 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:21:50,685 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:21:50,709 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:21:50,709 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:21:50,709 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:21:50,742 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 14:21:51,065 [ERROR] - asyncio - Task exception was never retrieved
+future: <Task finished name='Task-1' coro=<main() done, defined at /home/aleksey/pythonProject/bot_russia_flowers/bot/main.py:26> exception=SystemExit(3)>
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/main.py", line 439, in main
+    await dp.start_polling(bot)
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 614, in start_polling
+    done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/tasks.py", line 464, in wait
+    return await _wait(fs, timeout, return_when, loop)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/tasks.py", line 550, in _wait
+    await waiter
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/main.py", line 467, in <module>
+    asyncio.run(main())
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 62, in __exit__
+    self.close()
+  File "/usr/lib/python3.12/asyncio/runners.py", line 70, in close
+    _cancel_all_tasks(loop)
+  File "/usr/lib/python3.12/asyncio/runners.py", line 206, in _cancel_all_tasks
+    loop.run_until_complete(tasks.gather(*to_cancel, return_exceptions=True))
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 678, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 645, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1999, in _run_once
+    handle._run()
+  File "/usr/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/main.py", line 443, in main
+    await admin_task
+  File "/home/aleksey/pythonProject/bot_russia_flowers/admin_web/main.py", line 120, in run_admin_web
+    await server.serve()
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 90, in serve
+    await self._serve(sockets)
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 105, in _serve
+    await self.startup(sockets=sockets)
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 192, in startup
+    sys.exit(STARTUP_FAILURE)
+SystemExit: 3
+2026-11-18 14:24:20,192 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:24:20,219 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:24:20,219 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:24:20,239 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:24:20,239 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:24:20,240 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:24:20,911 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:27:32,960 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:27:32,989 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:27:32,989 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:27:33,010 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:27:33,010 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:27:33,010 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:27:33,815 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:27:34,116 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-11-18 14:27:34,116 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 14:27:38,283 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-11-18 14:27:38,283 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 14:27:39,455 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-11-18 14:27:39,456 [WARNING] - aiogram.dispatcher - Sleep for 1.261893 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-18 14:27:43,865 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-11-18 14:27:43,866 [WARNING] - aiogram.dispatcher - Sleep for 1.144308 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-18 14:27:45,229 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-11-18 14:27:45,229 [WARNING] - aiogram.dispatcher - Sleep for 1.680928 seconds and try again... (tryings = 2, bot id = 9239151532)
+2026-11-18 14:27:47,121 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 14:27:47,122 [INFO] - aiogram.dispatcher - Polling stopped for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:27:47,122 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 14:27:47,320 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 14:27:47,374 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-18 14:27:50,058 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-11-18 14:27:50,058 [WARNING] - aiogram.dispatcher - Sleep for 1.404407 seconds and try again... (tryings = 2, bot id = 9239151532)
+2026-11-18 14:27:57,746 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:27:57,774 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:27:57,774 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:27:57,797 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:27:57,797 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:27:57,797 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:27:58,596 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:28:02,305 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 14:28:02,306 [INFO] - aiogram.dispatcher - Polling stopped for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:28:02,307 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 14:28:02,452 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 14:28:02,559 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-18 14:28:15,911 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:28:15,942 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:28:15,942 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:28:15,965 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:28:15,965 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:28:15,965 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:28:16,755 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:31:59,555 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 14:31:59,556 [INFO] - aiogram.dispatcher - Polling stopped for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:31:59,556 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 14:31:59,701 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 14:31:59,807 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-18 14:45:33,306 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:45:33,332 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:45:33,332 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:45:33,352 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:45:33,352 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:45:33,352 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:45:34,015 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:46:37,592 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:46:37,618 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:46:37,619 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:46:37,637 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:46:37,637 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:46:37,637 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:46:37,662 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 14:46:37,985 [ERROR] - asyncio - Task exception was never retrieved
+future: <Task finished name='Task-1' coro=<main() done, defined at /home/aleksey/pythonProject/bot_russia_flowers/bot/main.py:26> exception=SystemExit(3)>
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/main.py", line 439, in main
+    await dp.start_polling(bot)
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 614, in start_polling
+    done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/tasks.py", line 464, in wait
+    return await _wait(fs, timeout, return_when, loop)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/tasks.py", line 550, in _wait
+    await waiter
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/main.py", line 467, in <module>
+    asyncio.run(main())
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 62, in __exit__
+    self.close()
+  File "/usr/lib/python3.12/asyncio/runners.py", line 70, in close
+    _cancel_all_tasks(loop)
+  File "/usr/lib/python3.12/asyncio/runners.py", line 206, in _cancel_all_tasks
+    loop.run_until_complete(tasks.gather(*to_cancel, return_exceptions=True))
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 678, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 645, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1999, in _run_once
+    handle._run()
+  File "/usr/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/main.py", line 443, in main
+    await admin_task
+  File "/home/aleksey/pythonProject/bot_russia_flowers/admin_web/main.py", line 120, in run_admin_web
+    await server.serve()
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 90, in serve
+    await self._serve(sockets)
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 105, in _serve
+    await self.startup(sockets=sockets)
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 192, in startup
+    sys.exit(STARTUP_FAILURE)
+SystemExit: 3
+2026-11-18 14:47:02,150 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:47:02,176 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:47:02,177 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:47:02,191 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:47:02,191 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:47:02,191 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:47:02,916 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:50:20,626 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:50:20,655 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:50:20,655 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:50:20,677 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:50:20,677 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:50:20,678 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:50:21,344 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:52:13,430 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 14:52:13,460 [INFO] - bot_russia_flowers - New user: 622070505 (akharkov88)
+2026-11-18 14:52:13,477 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 14:52:13,478 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 14:52:13,487 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 14:52:13,491 [INFO] - bot_russia_flowers - DEBUG catalog: initialized stack with categories
+2026-11-18 14:52:13,491 [INFO] - bot_russia_flowers - DEBUG push: screen=categories, cur=main_menu, cur_cat=0, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}], kwargs={}
+2026-11-18 14:52:13,491 [INFO] - bot_russia_flowers - DEBUG push: same screen+cat as top, updated without push. stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}]
+2026-11-18 14:52:14,113 [INFO] - aiogram.event - Update id=865971379 is handled. Duration 685 ms by bot id=9239151532
+2026-11-18 14:52:15,605 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-18 14:52:15,620 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-18 14:52:15,620 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-18 14:52:15,638 [INFO] - bot_russia_flowers - DEBUG push: screen=products, cur=categories, cur_cat=0, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}], kwargs={'cat_id': 1}
+2026-11-18 14:52:15,638 [INFO] - bot_russia_flowers - DEBUG push: appended products to stack, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}]
+2026-11-18 14:52:15,638 [INFO] - bot_russia_flowers - DEBUG push: stack_after=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}]
+2026-11-18 14:52:16,102 [INFO] - aiogram.event - Update id=865971380 is handled. Duration 498 ms by bot id=9239151532
+2026-11-18 14:52:17,567 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-18 14:52:17,585 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-18 14:52:17,585 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-18 14:52:17,594 [INFO] - bot_russia_flowers - DEBUG push: screen=product, cur=products, cur_cat=1, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}], kwargs={'cat_id': 1, 'product_id': 1}
+2026-11-18 14:52:17,594 [INFO] - bot_russia_flowers - DEBUG push: appended product to stack, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}, {'screen': 'product', 'cat_id': 1, 'product_id': 1}]
+2026-11-18 14:52:17,594 [INFO] - bot_russia_flowers - DEBUG push: stack_after=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}, {'screen': 'product', 'cat_id': 1, 'product_id': 1}]
+2026-11-18 14:52:18,737 [INFO] - aiogram.event - Update id=865971381 is handled. Duration 1172 ms by bot id=9239151532
+2026-11-18 14:52:19,927 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-18 14:52:19,939 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-18 14:52:19,939 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-18 14:52:19,939 [INFO] - bot_russia_flowers - DEBUG pop: stack_before=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}, {'screen': 'product', 'cat_id': 1, 'product_id': 1}]
+2026-11-18 14:52:19,940 [INFO] - bot_russia_flowers - DEBUG pop: returning prev={'screen': 'products', 'cat_id': 1, 'product_id': 0}
+2026-11-18 14:52:20,564 [INFO] - aiogram.event - Update id=865971382 is handled. Duration 638 ms by bot id=9239151532
+2026-11-18 14:52:21,787 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-18 14:52:21,796 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-18 14:52:21,796 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-18 14:52:21,801 [INFO] - bot_russia_flowers - DEBUG push: screen=product, cur=products, cur_cat=1, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}], kwargs={'cat_id': 1, 'product_id': 1}
+2026-11-18 14:52:21,801 [INFO] - bot_russia_flowers - DEBUG push: appended product to stack, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}, {'screen': 'product', 'cat_id': 1, 'product_id': 1}]
+2026-11-18 14:52:21,802 [INFO] - bot_russia_flowers - DEBUG push: stack_after=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}, {'screen': 'product', 'cat_id': 1, 'product_id': 1}]
+2026-11-18 14:52:22,822 [INFO] - aiogram.event - Update id=865971383 is handled. Duration 1036 ms by bot id=9239151532
+2026-11-18 14:52:24,130 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-18 14:52:24,145 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-18 14:52:24,145 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-18 14:52:24,608 [INFO] - aiogram.event - Update id=865971384 is handled. Duration 480 ms by bot id=9239151532
+2026-11-18 14:52:29,412 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 14:52:29,424 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 📋 Мои заказы
+2026-11-18 14:52:29,424 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 14:52:29,431 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 14:52:29,637 [INFO] - aiogram.event - Update id=865971385 is handled. Duration 228 ms by bot id=9239151532
+2026-11-18 14:52:33,577 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 14:52:33,588 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🛒 Корзина
+2026-11-18 14:52:33,589 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 14:52:33,593 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 14:52:33,809 [INFO] - aiogram.event - Update id=865971386 is handled. Duration 234 ms by bot id=9239151532
+2026-11-18 14:52:35,983 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-18 14:52:35,995 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-18 14:52:35,996 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-18 14:52:36,441 [INFO] - aiogram.event - Update id=865971387 is handled. Duration 460 ms by bot id=9239151532
+2026-11-18 14:52:44,033 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 14:52:44,045 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: Нижний Новгород, ул. Белинского, д. 10, кв. 5
+2026-11-18 14:52:44,046 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 14:52:44,048 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 14:52:44,253 [INFO] - aiogram.event - Update id=865971388 is handled. Duration 222 ms by bot id=9239151532
+2026-11-18 14:52:54,380 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 14:52:54,391 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 15.11
+2026-11-18 14:52:54,392 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 14:52:54,395 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 14:52:54,629 [INFO] - aiogram.event - Update id=865971389 is handled. Duration 251 ms by bot id=9239151532
+2026-11-18 14:53:00,659 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 14:53:00,670 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 5
+2026-11-18 14:53:00,670 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 14:53:00,673 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 14:53:00,891 [INFO] - aiogram.event - Update id=865971390 is handled. Duration 235 ms by bot id=9239151532
+2026-11-18 14:53:09,646 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 14:53:09,661 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 890607645633
+2026-11-18 14:53:09,661 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 14:53:09,664 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 14:53:09,877 [INFO] - aiogram.event - Update id=865971391 is handled. Duration 232 ms by bot id=9239151532
+2026-11-18 14:53:14,328 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 14:53:14,341 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 3
+2026-11-18 14:53:14,341 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 14:53:14,346 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 14:53:14,832 [INFO] - aiogram.event - Update id=865971392 is handled. Duration 507 ms by bot id=9239151532
+2026-11-18 14:53:25,255 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 14:53:25,267 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 📍 Контакты
+2026-11-18 14:53:25,267 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 14:53:25,272 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 14:53:25,465 [INFO] - aiogram.event - Update id=865971393 is handled. Duration 211 ms by bot id=9239151532
+2026-11-18 14:56:16,148 [WARNING] - bot_russia_flowers - Error in notifications processor: (sqlalchemy.dialects.postgresql.asyncpg.InvalidCachedStatementError) cached statement plan is invalid due to a database schema or configuration change (SQLAlchemy asyncpg dialect will now invalidate all prepared caches in response to this exception)
+[SQL: SELECT notifications.id, notifications.user_id, notifications.telegram_id, notifications.chat_id, notifications.text, notifications.image_url, notifications.sent, notifications.created_at 
+FROM notifications 
+WHERE notifications.sent = false ORDER BY notifications.created_at 
+ LIMIT $1::INTEGER]
+[parameters: (50,)]
+(Background on this error at: https://sqlalche.me/e/21/tw8g)
+2026-11-18 14:58:23,580 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:58:23,637 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:58:23,637 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:58:23,667 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:58:23,667 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:58:23,668 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:58:24,431 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:58:29,485 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 14:58:29,487 [INFO] - aiogram.dispatcher - Polling stopped for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 14:58:29,487 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 14:58:29,653 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 14:58:29,740 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-18 14:59:52,820 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 14:59:52,873 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 14:59:52,873 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 14:59:52,900 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 14:59:52,901 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 14:59:52,901 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 14:59:53,567 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 15:01:34,173 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 15:01:34,174 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 15:01:48,954 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 15:01:49,015 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 15:01:49,016 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 15:01:49,046 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 15:01:49,046 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 15:01:49,047 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 15:01:50,863 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 15:01:54,622 [INFO] - bot_russia_flowers - Notification sent to user 622070505: 📦 Заказ #1
+
+Ваш заказ теперь имеет статус: 🚚 Доставлен
+
+Спасибо за покупку! 🌸
+2026-11-18 15:01:54,623 [INFO] - bot_russia_flowers - Notification skipped (no chat_id): 📦 Заказ #1
+Статус: 🚚 Доставлен
+2026-11-18 15:01:54,630 [INFO] - bot_russia_flowers - Processed 2 notifications
+2026-11-18 15:02:40,342 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 15:02:40,370 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 15:02:40,370 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 15:02:40,378 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 15:02:40,602 [INFO] - aiogram.event - Update id=865971394 is handled. Duration 262 ms by bot id=9239151532
+2026-11-18 15:06:49,992 [INFO] - bot_russia_flowers - Photo (file) sent successfully to 622070505
+2026-11-18 15:09:30,108 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 15:09:30,109 [INFO] - aiogram.dispatcher - Polling stopped for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 15:09:30,109 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 15:09:30,254 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 15:09:30,362 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-18 15:47:33,617 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 15:47:33,645 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 15:47:33,646 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 15:47:33,667 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 15:47:33,667 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 15:47:33,668 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 15:47:35,375 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 15:48:28,734 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 15:48:28,752 [INFO] - bot_russia_flowers - New user: 622070505 (akharkov88)
+2026-11-18 15:48:28,760 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 15:48:28,760 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 15:48:28,768 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 15:48:29,371 [INFO] - aiogram.event - Update id=865971395 is handled. Duration 638 ms by bot id=9239151532
+2026-11-18 15:48:40,026 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 15:48:40,038 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 15:48:40,038 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 15:48:40,041 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 15:48:40,246 [INFO] - aiogram.event - Update id=865971396 is handled. Duration 221 ms by bot id=9239151532
+2026-11-18 15:51:40,691 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 15:51:40,692 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 15:52:41,698 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 15:52:41,698 [WARNING] - aiogram.dispatcher - Sleep for 1.315071 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-18 15:52:53,773 [INFO] - aiogram.dispatcher - Connection established (tryings = 2, bot id = 9239151532)
+2026-11-18 15:58:21,606 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 15:58:21,606 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 15:58:33,255 [INFO] - aiogram.dispatcher - Connection established (tryings = 1, bot id = 9239151532)
+2026-11-18 16:04:16,797 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 16:04:16,824 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 16:04:16,825 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 16:04:16,845 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 16:04:16,845 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 16:04:16,846 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 16:04:17,634 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 16:08:00,310 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 16:08:00,311 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 16:08:06,396 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 16:08:06,397 [WARNING] - aiogram.dispatcher - Sleep for 1.374179 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-18 16:09:07,776 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 16:09:07,777 [WARNING] - aiogram.dispatcher - Sleep for 1.792372 seconds and try again... (tryings = 2, bot id = 9239151532)
+2026-11-18 16:10:09,573 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 16:10:09,574 [WARNING] - aiogram.dispatcher - Sleep for 2.259026 seconds and try again... (tryings = 3, bot id = 9239151532)
+2026-11-18 16:10:22,350 [INFO] - aiogram.dispatcher - Connection established (tryings = 4, bot id = 9239151532)
+2026-11-18 16:11:06,797 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 16:11:06,825 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 16:11:06,825 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 16:11:06,849 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 16:11:06,849 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 16:11:06,849 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 16:11:07,532 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 16:11:22,404 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 16:11:22,432 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 16:11:22,432 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 16:11:22,438 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 16:11:23,118 [INFO] - aiogram.event - Update id=865971397 is handled. Duration 714 ms by bot id=9239151532
+2026-11-18 16:11:51,747 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 16:11:51,760 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 16:11:51,761 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 16:11:51,763 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 16:11:52,204 [INFO] - aiogram.event - Update id=865971398 is handled. Duration 458 ms by bot id=9239151532
+2026-11-18 16:16:18,007 [INFO] - bot_russia_flowers - Chat send for user 1: message='Ð¢ÐµÑ\x81Ñ\x82Ð¾Ð²Ñ\x8bÐ¹ Ð¾Ñ\x82Ð²ÐµÑ\x82', image_files=0
+2026-11-18 16:16:18,010 [INFO] - bot_russia_flowers - Saved outgoing message for user 1: text='Ð¢ÐµÑ\x81Ñ\x82Ð¾Ð²Ñ\x8bÐ¹ Ð¾Ñ\x82Ð²ÐµÑ\x82'
+2026-11-18 16:16:18,015 [INFO] - bot_russia_flowers - Committed outgoing message + notification for user 1
+2026-11-18 16:16:22,556 [INFO] - bot_russia_flowers - Notification sent to user 622070505: Ð¢ÐµÑÑÐ¾Ð²ÑÐ¹ Ð¾ÑÐ²ÐµÑ
+2026-11-18 16:16:22,563 [INFO] - bot_russia_flowers - Processed 1 notifications
+2026-11-18 16:21:46,165 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 16:21:46,166 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 16:22:47,172 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 16:22:47,172 [WARNING] - aiogram.dispatcher - Sleep for 1.449061 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-18 16:22:59,185 [INFO] - aiogram.dispatcher - Connection established (tryings = 2, bot id = 9239151532)
+2026-11-18 16:36:22,227 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 16:36:22,227 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 16:36:33,798 [INFO] - aiogram.dispatcher - Connection established (tryings = 1, bot id = 9239151532)
+2026-11-18 16:42:27,644 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 16:42:27,645 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 16:42:39,665 [INFO] - aiogram.dispatcher - Connection established (tryings = 1, bot id = 9239151532)
+2026-11-18 16:59:47,818 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 16:59:47,819 [INFO] - aiogram.dispatcher - Polling stopped for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 16:59:47,819 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 16:59:47,926 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 16:59:48,072 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-18 16:59:52,280 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 16:59:52,308 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 16:59:52,309 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 16:59:52,331 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 16:59:52,332 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 16:59:52,332 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 17:00:52,432 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 17:00:52,685 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-18 17:02:10,504 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 17:02:10,531 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 17:02:10,532 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 17:02:10,552 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 17:02:10,552 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 17:02:10,552 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 17:02:11,502 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 17:02:11,685 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 17:02:11,686 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 17:02:11,687 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 17:02:11,687 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 17:02:11,688 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 17:02:11,701 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 17:02:11,702 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 17:02:11,707 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 17:02:11,707 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 17:02:11,708 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 17:02:11,709 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 17:02:11,709 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 17:02:11,713 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 17:02:11,713 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 17:02:11,722 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 17:02:11,723 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 17:02:11,724 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 17:02:11,724 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 17:02:11,725 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 17:02:11,726 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 17:02:12,388 [INFO] - aiogram.event - Update id=865971401 is handled. Duration 704 ms by bot id=9239151532
+2026-11-18 17:02:12,410 [INFO] - aiogram.event - Update id=865971403 is handled. Duration 726 ms by bot id=9239151532
+2026-11-18 17:02:12,470 [INFO] - aiogram.event - Update id=865971399 is handled. Duration 788 ms by bot id=9239151532
+2026-11-18 17:02:12,880 [INFO] - aiogram.event - Update id=865971402 is handled. Duration 1196 ms by bot id=9239151532
+2026-11-18 17:02:12,880 [INFO] - aiogram.event - Update id=865971400 is handled. Duration 1197 ms by bot id=9239151532
+2026-11-18 17:03:19,371 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 17:03:19,399 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 17:03:19,400 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 17:03:19,423 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 17:03:19,423 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 17:03:19,424 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 17:03:20,113 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 17:03:36,047 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 17:03:36,065 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 17:03:36,066 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 17:03:36,078 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 17:03:36,952 [INFO] - aiogram.event - Update id=865971404 is handled. Duration 906 ms by bot id=9239151532
+2026-11-18 17:05:42,674 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 17:05:42,674 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 17:06:43,678 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 17:06:43,679 [WARNING] - aiogram.dispatcher - Sleep for 1.332448 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-18 17:07:45,016 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 17:07:45,016 [WARNING] - aiogram.dispatcher - Sleep for 1.843728 seconds and try again... (tryings = 2, bot id = 9239151532)
+2026-11-18 17:07:57,387 [INFO] - aiogram.dispatcher - Connection established (tryings = 3, bot id = 9239151532)
+2026-11-18 17:20:28,877 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 17:20:28,904 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 17:20:28,905 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 17:20:28,924 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 17:20:28,925 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 17:20:28,925 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 17:20:36,806 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 17:20:36,807 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-18 17:20:36,989 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-18 17:20:37,058 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-18 17:25:21,028 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 17:25:21,054 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 17:25:21,054 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 17:25:21,072 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 17:25:21,072 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 17:25:21,073 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 17:25:21,844 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 17:28:28,208 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 17:28:28,230 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 17:28:28,230 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 17:28:28,234 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 17:28:29,037 [INFO] - aiogram.event - Update id=865971405 is handled. Duration 831 ms by bot id=9239151532
+2026-11-18 17:29:06,092 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 17:29:06,098 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 17:29:06,098 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 17:29:06,100 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 17:29:06,313 [INFO] - aiogram.event - Update id=865971406 is handled. Duration 223 ms by bot id=9239151532
+2026-11-18 17:30:30,727 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 17:30:30,727 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 17:31:31,733 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 17:31:31,733 [WARNING] - aiogram.dispatcher - Sleep for 1.171728 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-18 17:31:44,473 [INFO] - aiogram.dispatcher - Connection established (tryings = 2, bot id = 9239151532)
+2026-11-18 17:34:58,467 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 17:34:58,493 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 17:34:58,493 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 17:36:36,890 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 17:36:36,917 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 17:36:36,917 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 17:36:36,935 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 17:36:36,935 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 17:36:36,936 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 17:36:37,577 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 17:37:30,401 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 17:37:30,422 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 17:37:30,422 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 17:37:30,426 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 17:37:32,206 [INFO] - aiogram.event - Update id=865971407 is handled. Duration 1808 ms by bot id=9239151532
+2026-11-18 17:41:43,873 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 17:41:43,873 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 17:41:55,027 [INFO] - aiogram.dispatcher - Connection established (tryings = 1, bot id = 9239151532)
+2026-11-18 17:51:32,876 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-18 17:51:32,877 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-18 17:52:33,884 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 17:52:33,884 [WARNING] - aiogram.dispatcher - Sleep for 1.371185 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-18 17:53:35,260 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-18 17:53:35,261 [WARNING] - aiogram.dispatcher - Sleep for 1.685702 seconds and try again... (tryings = 2, bot id = 9239151532)
+2026-11-18 18:01:43,253 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 18:01:43,280 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 18:01:43,280 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 18:01:43,301 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 18:01:43,301 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 18:01:43,301 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 18:01:44,101 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 18:04:34,228 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 18:04:34,240 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 18:04:34,240 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 18:04:34,246 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 18:04:34,926 [ERROR] - bot_russia_flowers - Error in msg_catalog: name 'user' is not defined
+2026-11-18 18:04:35,146 [ERROR] - bot_russia_flowers - Error in handler for user 622070505, event Message: name 'user' is not defined
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 83, in msg_catalog
+    await save_outgoing(user.id, "🌸 Каталог пока пуст. Загляните позже!")
+                        ^^^^
+NameError: name 'user' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/middlewares/tracking.py", line 117, in __call__
+    result = await handler(event, data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 103, in msg_catalog
+    await save_outgoing(user.id, "❌ Произошла ошибка при загрузке каталога.")
+                        ^^^^
+NameError: name 'user' is not defined
+2026-11-18 18:04:35,150 [INFO] - aiogram.event - Update id=865971408 is not handled. Duration 922 ms by bot id=9239151532
+2026-11-18 18:04:35,150 [ERROR] - aiogram.event - Cause exception while process update id=865971408 by bot id=9239151532
+NameError: name 'user' is not defined
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 83, in msg_catalog
+    await save_outgoing(user.id, "🌸 Каталог пока пуст. Загляните позже!")
+                        ^^^^
+NameError: name 'user' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 321, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 284, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 172, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 164, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 200, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 172, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 164, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 192, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/middlewares/tracking.py", line 117, in __call__
+    result = await handler(event, data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 103, in msg_catalog
+    await save_outgoing(user.id, "❌ Произошла ошибка при загрузке каталога.")
+                        ^^^^
+NameError: name 'user' is not defined
+2026-11-18 18:04:53,629 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 18:04:53,658 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 18:04:53,658 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 18:04:53,680 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 18:04:53,680 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 18:04:53,681 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 18:04:54,449 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-18 18:05:09,855 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-18 18:05:09,880 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-18 18:05:09,880 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-18 18:05:09,885 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-18 18:05:10,740 [ERROR] - bot_russia_flowers - Error in msg_catalog: name 'user' is not defined
+2026-11-18 18:05:11,024 [ERROR] - bot_russia_flowers - Error in handler for user 622070505, event Message: name 'user' is not defined
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 83, in msg_catalog
+    await save_outgoing(user.id, "🌸 Каталог пока пуст. Загляните позже!")
+                        ^^^^
+NameError: name 'user' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/middlewares/tracking.py", line 117, in __call__
+    result = await handler(event, data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 103, in msg_catalog
+    await save_outgoing(user.id, "❌ Произошла ошибка при загрузке каталога.")
+                        ^^^^
+NameError: name 'user' is not defined
+2026-11-18 18:05:11,031 [INFO] - aiogram.event - Update id=865971409 is not handled. Duration 1177 ms by bot id=9239151532
+2026-11-18 18:05:11,032 [ERROR] - aiogram.event - Cause exception while process update id=865971409 by bot id=9239151532
+NameError: name 'user' is not defined
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 83, in msg_catalog
+    await save_outgoing(user.id, "🌸 Каталог пока пуст. Загляните позже!")
+                        ^^^^
+NameError: name 'user' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 321, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 284, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 172, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 164, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 200, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 172, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 164, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 192, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/middlewares/tracking.py", line 117, in __call__
+    result = await handler(event, data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 103, in msg_catalog
+    await save_outgoing(user.id, "❌ Произошла ошибка при загрузке каталога.")
+                        ^^^^
+NameError: name 'user' is not defined
+2026-11-18 18:11:16,641 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-18 18:11:16,668 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-18 18:11:16,668 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-18 18:11:16,688 [INFO] - bot_russia_flowers - Database initialized
+2026-11-18 18:11:16,688 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-18 18:11:16,688 [INFO] - aiogram.dispatcher - Start polling
+2026-11-18 18:11:17,534 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-19 09:05:23,167 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-19 09:05:23,167 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-19 09:06:01,485 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [Connection reset by peer]
+2026-11-19 09:06:01,485 [WARNING] - aiogram.dispatcher - Sleep for 1.175985 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-19 09:06:14,779 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [Connection reset by peer]
+2026-11-19 09:06:14,780 [WARNING] - aiogram.dispatcher - Sleep for 1.455444 seconds and try again... (tryings = 2, bot id = 9239151532)
+2026-11-19 09:06:25,843 [INFO] - aiogram.dispatcher - Connection established (tryings = 3, bot id = 9239151532)
+2026-11-19 09:06:25,844 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:06:25,855 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-19 09:06:25,855 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:06:25,856 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:06:26,118 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:06:26,124 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-19 09:06:26,124 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:06:26,125 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:06:31,141 [ERROR] - bot_russia_flowers - Error in msg_catalog: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-19 09:06:31,198 [ERROR] - bot_russia_flowers - Error in msg_catalog: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-19 09:06:36,209 [ERROR] - bot_russia_flowers - Error in handler for user 622070505, event Message: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1337, in _wrap_create_connection
+    return await self._loop.create_connection(*args, **kwargs, sock=sock)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+  File "/usr/lib/python3.12/asyncio/sslproto.py", line 581, in _on_handshake_complete
+    raise handshake_exc
+ConnectionResetError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 167, in make_request
+    async with session.post(
+               ^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 1756, in __aenter__
+    self._resp: _RetType_co = await self._coro
+                              ^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 900, in _request
+    resp = await handler(req)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 854, in _connect_and_send_request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 665, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1263, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1641, in _create_direct_connection
+    raise last_exc
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1610, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1345, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/middlewares/tracking.py", line 117, in __call__
+    result = await handler(event, data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 110, in msg_catalog
+    await message.answer("❌ Произошла ошибка при загрузке каталога.")
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 82, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 515, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 259, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 176, in make_request
+    raise TelegramNetworkError(method=method, message=f"{type(e).__name__}: {e}") from e
+aiogram.exceptions.TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-19 09:06:36,220 [INFO] - aiogram.event - Update id=865971410 is not handled. Duration 10376 ms by bot id=9239151532
+2026-11-19 09:06:36,220 [ERROR] - aiogram.event - Cause exception while process update id=865971410 by bot id=9239151532
+TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1337, in _wrap_create_connection
+    return await self._loop.create_connection(*args, **kwargs, sock=sock)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+  File "/usr/lib/python3.12/asyncio/sslproto.py", line 581, in _on_handshake_complete
+    raise handshake_exc
+ConnectionResetError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 167, in make_request
+    async with session.post(
+               ^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 1756, in __aenter__
+    self._resp: _RetType_co = await self._coro
+                              ^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 900, in _request
+    resp = await handler(req)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 854, in _connect_and_send_request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 665, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1263, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1641, in _create_direct_connection
+    raise last_exc
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1610, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1345, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 321, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 284, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 172, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 164, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 200, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 172, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 164, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 192, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/middlewares/tracking.py", line 117, in __call__
+    result = await handler(event, data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 110, in msg_catalog
+    await message.answer("❌ Произошла ошибка при загрузке каталога.")
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 82, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 515, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 259, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 176, in make_request
+    raise TelegramNetworkError(method=method, message=f"{type(e).__name__}: {e}") from e
+aiogram.exceptions.TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-19 09:06:36,265 [ERROR] - bot_russia_flowers - Error in handler for user 622070505, event Message: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1337, in _wrap_create_connection
+    return await self._loop.create_connection(*args, **kwargs, sock=sock)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+  File "/usr/lib/python3.12/asyncio/sslproto.py", line 581, in _on_handshake_complete
+    raise handshake_exc
+ConnectionResetError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 167, in make_request
+    async with session.post(
+               ^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 1756, in __aenter__
+    self._resp: _RetType_co = await self._coro
+                              ^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 900, in _request
+    resp = await handler(req)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 854, in _connect_and_send_request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 665, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1263, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1641, in _create_direct_connection
+    raise last_exc
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1610, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1345, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/middlewares/tracking.py", line 117, in __call__
+    result = await handler(event, data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 110, in msg_catalog
+    await message.answer("❌ Произошла ошибка при загрузке каталога.")
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 82, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 515, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 259, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 176, in make_request
+    raise TelegramNetworkError(method=method, message=f"{type(e).__name__}: {e}") from e
+aiogram.exceptions.TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-19 09:06:36,271 [INFO] - aiogram.event - Update id=865971411 is not handled. Duration 10153 ms by bot id=9239151532
+2026-11-19 09:06:36,272 [ERROR] - aiogram.event - Cause exception while process update id=865971411 by bot id=9239151532
+TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1337, in _wrap_create_connection
+    return await self._loop.create_connection(*args, **kwargs, sock=sock)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1159, in create_connection
+    transport, protocol = await self._create_connection_transport(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1192, in _create_connection_transport
+    await waiter
+  File "/usr/lib/python3.12/asyncio/sslproto.py", line 581, in _on_handshake_complete
+    raise handshake_exc
+ConnectionResetError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 167, in make_request
+    async with session.post(
+               ^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 1756, in __aenter__
+    self._resp: _RetType_co = await self._coro
+                              ^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 900, in _request
+    resp = await handler(req)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/client.py", line 854, in _connect_and_send_request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 665, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1263, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1641, in _create_direct_connection
+    raise last_exc
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1610, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiohttp/connector.py", line 1345, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 321, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 284, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 172, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 164, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 200, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 172, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 164, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 192, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/middlewares/tracking.py", line 117, in __call__
+    result = await handler(event, data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/bot/handlers/catalog.py", line 110, in msg_catalog
+    await message.answer("❌ Произошла ошибка при загрузке каталога.")
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 82, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 515, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 259, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aleksey/pythonProject/bot_russia_flowers/.venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 176, in make_request
+    raise TelegramNetworkError(method=method, message=f"{type(e).__name__}: {e}") from e
+aiogram.exceptions.TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-19 09:11:27,036 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-19 09:11:27,063 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-19 09:11:27,063 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-19 09:11:27,077 [INFO] - bot_russia_flowers - Database initialized
+2026-11-19 09:11:27,077 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-19 09:11:27,077 [INFO] - aiogram.dispatcher - Start polling
+2026-11-19 09:11:27,702 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-19 09:11:35,122 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-19 09:11:35,123 [INFO] - aiogram.dispatcher - Polling stopped for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-19 09:11:35,123 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-19 09:11:35,258 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-19 09:11:35,374 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-19 09:22:34,455 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-19 09:22:34,482 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-19 09:22:34,482 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-19 09:22:34,502 [INFO] - bot_russia_flowers - Database initialized
+2026-11-19 09:22:34,502 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-19 09:22:34,503 [INFO] - aiogram.dispatcher - Start polling
+2026-11-19 09:22:35,205 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-19 09:33:14,467 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:33:14,478 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-19 09:33:14,478 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:33:14,480 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:33:14,490 [INFO] - bot_russia_flowers - Saved outgoing message to user 1: 🌸 Каталог пока пуст. Загляните позже!
+2026-11-19 09:34:14,493 [ERROR] - bot_russia_flowers - Error in msg_catalog: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-19 09:34:14,500 [INFO] - bot_russia_flowers - Saved outgoing message to user 1: ❌ Произошла ошибка при загрузке каталога.
+2026-11-19 09:34:15,023 [INFO] - aiogram.event - Update id=865971412 is handled. Duration 60558 ms by bot id=9239151532
+2026-11-19 09:34:34,824 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-19 09:34:34,853 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-19 09:34:34,853 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-19 09:34:34,871 [INFO] - bot_russia_flowers - Database initialized
+2026-11-19 09:34:34,871 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-19 09:34:34,872 [INFO] - aiogram.dispatcher - Start polling
+2026-11-19 09:34:35,532 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-19 09:34:50,125 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:34:50,142 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-19 09:34:50,142 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:34:50,144 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:34:50,156 [INFO] - bot_russia_flowers - Saved outgoing message to user 1: 🌸 Каталог пока пуст. Загляните позже!
+2026-11-19 09:34:50,846 [INFO] - aiogram.event - Update id=865971413 is handled. Duration 722 ms by bot id=9239151532
+2026-11-19 09:36:10,439 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-19 09:36:10,439 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-19 09:36:21,942 [INFO] - aiogram.dispatcher - Connection established (tryings = 1, bot id = 9239151532)
+2026-11-19 09:38:43,003 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-11-19 09:38:43,004 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-19 09:39:44,009 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [None]
+2026-11-19 09:39:44,010 [WARNING] - aiogram.dispatcher - Sleep for 0.966301 seconds and try again... (tryings = 1, bot id = 9239151532)
+2026-11-19 09:39:55,577 [INFO] - aiogram.dispatcher - Connection established (tryings = 2, bot id = 9239151532)
+2026-11-19 09:40:36,104 [INFO] - bot_russia_flowers - Photo (file) sent successfully to 622070505
+2026-11-19 09:41:07,094 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:41:07,100 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🌸 Каталог
+2026-11-19 09:41:07,100 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:41:07,102 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:41:07,104 [INFO] - bot_russia_flowers - DEBUG catalog: initialized stack with categories
+2026-11-19 09:41:07,104 [INFO] - bot_russia_flowers - DEBUG push: screen=categories, cur=main_menu, cur_cat=0, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}], kwargs={}
+2026-11-19 09:41:07,104 [INFO] - bot_russia_flowers - DEBUG push: same screen+cat as top, updated without push. stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}]
+2026-11-19 09:41:07,106 [INFO] - bot_russia_flowers - Saved outgoing message to user 1: 🌸 Выберите категорию:
+2026-11-19 09:41:07,441 [INFO] - aiogram.event - Update id=865971414 is handled. Duration 348 ms by bot id=9239151532
+2026-11-19 09:41:08,757 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-19 09:41:08,772 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-19 09:41:08,773 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-19 09:41:08,789 [INFO] - bot_russia_flowers - DEBUG push: screen=products, cur=categories, cur_cat=0, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}], kwargs={'cat_id': 1}
+2026-11-19 09:41:08,789 [INFO] - bot_russia_flowers - DEBUG push: appended products to stack, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}]
+2026-11-19 09:41:08,789 [INFO] - bot_russia_flowers - DEBUG push: stack_after=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}]
+2026-11-19 09:41:09,275 [INFO] - aiogram.event - Update id=865971415 is handled. Duration 519 ms by bot id=9239151532
+2026-11-19 09:41:10,363 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-19 09:41:10,375 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-19 09:41:10,375 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-19 09:41:10,381 [INFO] - bot_russia_flowers - DEBUG push: screen=product, cur=products, cur_cat=1, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}], kwargs={'cat_id': 1, 'product_id': 1}
+2026-11-19 09:41:10,381 [INFO] - bot_russia_flowers - DEBUG push: appended product to stack, stack=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}, {'screen': 'product', 'cat_id': 1, 'product_id': 1}]
+2026-11-19 09:41:10,381 [INFO] - bot_russia_flowers - DEBUG push: stack_after=[{'screen': 'categories', 'cat_id': 0, 'product_id': 0}, {'screen': 'products', 'cat_id': 1, 'product_id': 0}, {'screen': 'product', 'cat_id': 1, 'product_id': 1}]
+2026-11-19 09:41:11,365 [INFO] - aiogram.event - Update id=865971416 is handled. Duration 1003 ms by bot id=9239151532
+2026-11-19 09:41:40,793 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-19 09:41:40,798 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-19 09:41:40,798 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-19 09:41:41,264 [INFO] - aiogram.event - Update id=865971417 is handled. Duration 472 ms by bot id=9239151532
+2026-11-19 09:41:43,874 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-19 09:41:43,882 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-19 09:41:43,883 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-19 09:41:44,536 [INFO] - aiogram.event - Update id=865971418 is handled. Duration 662 ms by bot id=9239151532
+2026-11-19 09:41:47,525 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:41:47,529 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 🛒 Корзина
+2026-11-19 09:41:47,530 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:41:47,531 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:41:47,821 [INFO] - aiogram.event - Update id=865971419 is handled. Duration 296 ms by bot id=9239151532
+2026-11-19 09:41:49,735 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=CallbackQuery, tg=622070505
+2026-11-19 09:41:49,749 [INFO] - bot_russia_flowers - Saved callback unknown:unknown from user 622070505
+2026-11-19 09:41:49,750 [INFO] - bot_russia_flowers - User: 622070505, event: CallbackQuery
+2026-11-19 09:41:50,127 [INFO] - aiogram.event - Update id=865971420 is handled. Duration 395 ms by bot id=9239151532
+2026-11-19 09:41:55,605 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:41:55,621 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: г. Нижний Новгород, ул. Белинского, д. 10, кв. 5
+2026-11-19 09:41:55,621 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:41:55,622 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:41:55,938 [INFO] - aiogram.event - Update id=865971421 is handled. Duration 335 ms by bot id=9239151532
+2026-11-19 09:42:00,151 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:42:00,158 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 5.11
+2026-11-19 09:42:00,158 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:42:00,159 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:42:00,353 [INFO] - aiogram.event - Update id=865971422 is handled. Duration 203 ms by bot id=9239151532
+2026-11-19 09:42:10,531 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:42:10,538 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 05.11
+2026-11-19 09:42:10,539 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:42:10,540 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:42:10,846 [INFO] - aiogram.event - Update id=865971423 is handled. Duration 318 ms by bot id=9239151532
+2026-11-19 09:42:17,171 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:42:17,186 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 10
+2026-11-19 09:42:17,186 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:42:17,188 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:42:17,351 [INFO] - aiogram.event - Update id=865971424 is handled. Duration 184 ms by bot id=9239151532
+2026-11-19 09:42:26,956 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:42:26,962 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: 7 (996) 041-22-27
+2026-11-19 09:42:26,962 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:42:26,964 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:42:27,155 [INFO] - aiogram.event - Update id=865971425 is handled. Duration 202 ms by bot id=9239151532
+2026-11-19 09:42:33,177 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=622070505
+2026-11-19 09:42:33,184 [INFO] - bot_russia_flowers - Saved incoming message from user 622070505: код домофон
+2026-11-19 09:42:33,184 [INFO] - bot_russia_flowers - User: 622070505, event: Message
+2026-11-19 09:42:33,186 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
+2026-11-19 09:42:34,039 [INFO] - aiogram.event - Update id=865971426 is handled. Duration 864 ms by bot id=9239151532

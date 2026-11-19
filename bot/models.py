@@ -1,5 +1,5 @@
-from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, Date, Time
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, Date, Time, BigInteger
 from sqlalchemy.orm import relationship, DeclarativeBase
 
 from bot.database import Base
@@ -14,7 +14,7 @@ class Category(Base):
     image_url = Column(String(500), nullable=True)
     is_active = Column(Boolean, default=True)
     sort_order = Column(Integer, default=0, nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
 
     products = relationship("Product", back_populates="category", cascade="all, delete-orphan")
 
@@ -31,7 +31,7 @@ class Product(Base):
     image_url = Column(String(500), nullable=True)
     is_active = Column(Boolean, default=True)
     quantity = Column(Integer, default=0, nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
 
     category = relationship("Category", back_populates="products")
     order_items = relationship("OrderItem", back_populates="product")
@@ -45,7 +45,7 @@ class ProductImage(Base):
     product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
     image_url = Column(String(500), nullable=False)
     order = Column(Integer, default=0)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
 
     product = relationship("Product", back_populates="images")
 
@@ -61,7 +61,7 @@ class User(Base):
     phone = Column(String(20), nullable=True)
     is_blocked = Column(Boolean, default=False)
     user_blocked_bot = Column(Boolean, default=False)  # User blocked the bot in Telegram
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
 
     orders = relationship("Order", back_populates="user", cascade="all, delete-orphan")
 
@@ -81,9 +81,9 @@ class Order(Base):
     is_custom = Column(Boolean, default=False)
     custom_description = Column(Text, nullable=True)
     order_date = Column(Date, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc),
-                        onupdate=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
+    updated_at = Column(DateTime, default=lambda: datetime.now(),
+                        onupdate=lambda: datetime.now())
 
     user = relationship("User", back_populates="orders")
     order_items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
@@ -107,12 +107,12 @@ class Notification(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    telegram_id = Column(Integer, nullable=True)
-    chat_id = Column(Integer, nullable=True)
+    telegram_id = Column(BigInteger, nullable=True)
+    chat_id = Column(BigInteger, nullable=True)
     text = Column(Text, nullable=False)
     image_url = Column(String(500), nullable=True)
     sent = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
 
 
 class Cart(Base):
@@ -124,9 +124,9 @@ class Cart(Base):
     data = Column(Text, nullable=False)  # JSON: {"product_id": quantity}
     total_price = Column(Float, default=0.0)
     status = Column(String(20), default="active")  # active | completed | abandoned
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc),
-                        onupdate=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
+    updated_at = Column(DateTime, default=lambda: datetime.now(),
+                        onupdate=lambda: datetime.now())
     abandoned_at = Column(DateTime, nullable=True)
 
     user = relationship("User", back_populates="carts")
@@ -143,7 +143,7 @@ class Message(Base):
     image_url = Column(String(500), nullable=True)
     callback_data = Column(Text, nullable=True)  # JSON callback data for button clicks
     sent = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
 
     user = relationship("User", back_populates="messages")
 
@@ -164,9 +164,9 @@ class Post(Base):
     status = Column(String(20), default="draft")  # draft | sending | sent | failed | scheduled
     audience = Column(Text, nullable=True)  # JSON: {"type": "all"} или {"type": "selected", "user_ids": [1, 2]}
     sent_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc),
-                        onupdate=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
+    updated_at = Column(DateTime, default=lambda: datetime.now(),
+                        onupdate=lambda: datetime.now())
 
     recipients = relationship("PostRecipient", back_populates="post", cascade="all, delete-orphan")
     stats = relationship("PostStats", back_populates="post", uselist=False, cascade="all, delete-orphan")
@@ -182,7 +182,7 @@ class PostRecipient(Base):
     status = Column(String(20), default="pending")  # pending | sent | failed
     sent_at = Column(DateTime, nullable=True)
     error_message = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
 
     post = relationship("Post", back_populates="recipients")
     user = relationship("User")
@@ -196,8 +196,8 @@ class PostStats(Base):
     total_sent = Column(Integer, default=0)
     total_failed = Column(Integer, default=0)
     total_pending = Column(Integer, default=0)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc),
-                        onupdate=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now())
+    updated_at = Column(DateTime, default=lambda: datetime.now(),
+                        onupdate=lambda: datetime.now())
 
     post = relationship("Post", back_populates="stats")
