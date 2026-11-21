@@ -95,10 +95,81 @@ kill_all() {
 }
 
 # ============================================
+# Настройка ngrok туннеля
+# ============================================
+setup_ngrok() {
+    local NGROK_BIN="/tmp/ngrok"
+    local NGROK_TOKEN='2OVFaiEfL1v5DuGyLYBt78Nbdhb_8732EsawD6ZCMiUr7rKCB'
+    
+    # Скачать ngrok если не существует
+    if [ ! -f "$NGROK_BIN" ]; then
+        echo "⬇️ Скачиваю ngrok..."
+        curl -sSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz | tar xz -C /tmp/
+        chmod +x "$NGROK_BIN"
+    fi
+    
+    # Авторизовать ngrok
+    "$NGROK_BIN" authtoken "$NGROK_TOKEN"
+    
+    echo "🚀 Запуск ngrok туннеля на порт 8001..."
+    "$NGROK_BIN" http 8001 &
+    NGROK_PID=$!
+    sleep 3
+    
+    # Получить ngrok URL
+    local NGROK_URL
+    NGROK_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | python3 -c "import sys,json; print(json.load(sys.stdin)['tunnels'][0]['public_url'])" 2>/dev/null)
+    
+    if [ -n "$NGROK_URL" ]; then
+        echo "✅ ngrok туннель запущен: $NGROK_URL"
+        echo "$NGROK_URL" > /tmp/ngrok_url.txt
+    else
+        echo "⚠️ Не удалось получить ngrok URL"
+        NGROK_PID=""
+    fi
+}
+
+# ============================================
+# Отправка сообщения в Telegram через бота
+# ============================================
+send_telegram_message() {
+    local message="$1"
+    local chat_id="-1004309485623"
+    local bot_token="${BOT_TOKEN:-}"
+    
+    if [ -z "$bot_token" ]; then
+        # Попробовать прочитать из .env
+        if [ -f ".env" ]; then
+            bot_token=$(grep '^BOT_TOKEN=' .env | cut -d'=' -f2- | tr -d '"' | tr -d "'" | xargs)
+        fi
+    fi
+    
+    if [ -n "$bot_token" ]; then
+        echo "📤 Отправка сообщения в Telegram..."
+        curl -s -X POST "https://api.telegram.org/bot${bot_token}/sendMessage" \
+            -d chat_id="$chat_id" \
+            -d text="$message" \
+            -d parse_mode="Markdown" \
+            --max-time 10 2>/dev/null
+        if [ $? -eq 0 ]; then
+            echo "✅ Сообщение отправлено в Telegram"
+        else
+            echo "⚠️ Не удалось отправить сообщение в Telegram"
+        fi
+    else
+        echo "⚠️ BOT_TOKEN не найден, сообщение не отправлено"
+        echo "💡 URL для доступа: $NGROK_URL"
+    fi
+}
+
+# ============================================
 # Очистка старого процесса бота
 # ============================================
 echo "Очистка старых процессов бота..."
 kill_all
+
+# Запустить ngrok туннель
+setup_ngrok
 
 # ============================================
 # Запуск бота и веб-панели админа
@@ -126,11 +197,19 @@ BOT_PID=$!
 
 echo "🤖 Бот запущен (PID: $BOT_PID)"
 
+# Отправить URL в Telegram (с задержкой чтобы бот успел запуститься)
+sleep 5
+if [ -n "$NGROK_PID" ] && [ -f /tmp/ngrok_url.txt ]; then
+    NGROK_URL=$(cat /tmp/ngrok_url.txt)
+    send_telegram_message "${NGROK_URL}" 2>/dev/null
+fi
+
 # Очистка при выходе
 cleanup() {
     echo "Остановка..."
     kill $BOT_PID 2>/dev/null
     [ -n "$PREVENT_SLEEP_PID" ] && kill $PREVENT_SLEEP_PID 2>/dev/null
+    [ -n "$NGROK_PID" ] && kill $NGROK_PID 2>/dev/null
     kill_all
     exit 0
 }
