@@ -23565,6 +23565,291 @@ aiogram.exceptions.TelegramNetworkError: HTTP Client says - ClientConnectorError
 2026-11-19 09:42:33,184 [INFO] - bot_russia_flowers - User: 622070505, event: Message
 2026-11-19 09:42:33,186 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Алексей (ID:1 | TG:622070505)
 2026-11-19 09:42:34,039 [INFO] - aiogram.event - Update id=865971426 is handled. Duration 864 ms by bot id=9239151532
+2026-11-21 12:32:19,899 [ERROR] - fastapi - Form data requires "python-multipart" to be installed. 
+You can install "python-multipart" with: 
+
+pip install python-multipart
+
+2026-11-21 12:32:38,776 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-21 12:32:38,784 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-21 12:32:38,784 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-21 12:32:38,813 [INFO] - bot_russia_flowers - Database initialized
+2026-11-21 12:32:38,813 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-21 12:32:38,814 [INFO] - aiogram.dispatcher - Start polling
+2026-11-21 12:33:38,893 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-21 12:33:39,144 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-21 12:34:05,927 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-21 12:34:05,933 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-21 12:34:05,933 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-21 12:34:05,952 [INFO] - bot_russia_flowers - Database initialized
+2026-11-21 12:34:05,953 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-21 12:34:05,953 [INFO] - aiogram.dispatcher - Start polling
+2026-11-21 12:34:06,424 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-21 12:37:28,645 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=9282682898
+2026-11-21 12:37:28,649 [INFO] - aiogram.event - Update id=865972563 is not handled. Duration 4 ms by bot id=9239151532
+2026-11-21 12:37:28,649 [ERROR] - aiogram.event - Cause exception while process update id=865972563 by bot id=9239151532
+DBAPIError: (sqlalchemy.dialects.postgresql.asyncpg.Error) invalid input for query argument $1: 9282682898 (value out of int32 range)
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.is_blocked, users.user_blocked_bot, users.created_at 
+FROM users 
+WHERE users.telegram_id = $1::INTEGER]
+[parameters: (9282682898,)]
+(Background on this error at: https://sqlalche.me/e/21/dbapi)
+Traceback (most recent call last):
+  File "asyncpg/protocol/prepared_stmt.pyx", line 175, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+  File "asyncpg/protocol/codecs/base.pyx", line 251, in asyncpg.protocol.protocol.Codec.encode
+  File "asyncpg/protocol/codecs/base.pyx", line 153, in asyncpg.protocol.protocol.Codec.encode_scalar
+    self.c_encoder(settings, buf, obj)
+  File "asyncpg/pgproto/codecs/int.pyx", line 60, in asyncpg.pgproto.pgproto.int4_encode
+OverflowError: value out of int32 range
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 620, in _prepare_and_execute
+    self._rows = deque(await prepared_stmt.fetch(*parameters))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/asyncpg/prepared_stmt.py", line 177, in fetch
+    data = await self.__bind_execute(args, 0, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/asyncpg/prepared_stmt.py", line 268, in __bind_execute
+    data, status, _ = await self.__do_execute(
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+        lambda protocol: protocol.bind_execute(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            self._state, args, '', limit, True, timeout))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/asyncpg/prepared_stmt.py", line 257, in __do_execute
+    return await executor(protocol)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "asyncpg/protocol/protocol.pyx", line 176, in bind_execute
+  File "asyncpg/protocol/prepared_stmt.pyx", line 204, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+asyncpg.exceptions.DataError: invalid input for query argument $1: 9282682898 (value out of int32 range)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 671, in execute
+    await_(self._prepare_and_execute(operation, parameters))
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/util/concurrency.py", line 171, in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/util/concurrency.py", line 209, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 633, in _prepare_and_execute
+    self._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 583, in _handle_exception
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 862, in _handle_exception
+    super()._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/connectors/asyncio.py", line 412, in _handle_exception
+    self._handle_exception_no_connection(self.dbapi, error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 855, in _handle_exception_no_connection
+    raise translated_error from error
+sqlalchemy.dialects.postgresql.asyncpg.AsyncAdapt_asyncpg_dbapi.Error: invalid input for query argument $1: 9282682898 (value out of int32 range)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/dispatcher.py", line 387, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/dispatcher.py", line 170, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 60, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/fsm/middleware.py", line 55, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/dispatcher.py", line 200, in _trigger_update
+    return await self.update.trigger(update, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/event/handler.py", line 76, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/dispatcher.py", line 350, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/router.py", line 179, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/router.py", line 171, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/router.py", line 207, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/router.py", line 179, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/router.py", line 171, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/router.py", line 199, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/bot/middlewares/tracking.py", line 34, in __call__
+    result = await session.execute(select(User).where(User.telegram_id == tg.id))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/ext/asyncio/session.py", line 652, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/util/concurrency.py", line 214, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2555, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2445, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/orm/context.py", line 357, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1494, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py", line 534, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1714, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<9 lines>...
+        param_dict=param_dict,
+    )
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1868, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1996, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2351, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 671, in execute
+    await_(self._prepare_and_execute(operation, parameters))
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/util/concurrency.py", line 171, in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/util/concurrency.py", line 209, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 633, in _prepare_and_execute
+    self._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 583, in _handle_exception
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 862, in _handle_exception
+    super()._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/connectors/asyncio.py", line 412, in _handle_exception
+    self._handle_exception_no_connection(self.dbapi, error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/flow/bot_flowers_russia/.venv/lib/python3.14/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 855, in _handle_exception_no_connection
+    raise translated_error from error
+sqlalchemy.exc.DBAPIError: (sqlalchemy.dialects.postgresql.asyncpg.Error) invalid input for query argument $1: 9282682898 (value out of int32 range)
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.is_blocked, users.user_blocked_bot, users.created_at 
+FROM users 
+WHERE users.telegram_id = $1::INTEGER]
+[parameters: (9282682898,)]
+(Background on this error at: https://sqlalche.me/e/21/dbapi)
+2026-11-21 12:56:09,556 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-21 12:56:09,557 [INFO] - aiogram.dispatcher - Polling stopped for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-21 12:56:09,557 [INFO] - aiogram.dispatcher - Polling stopped
+2026-11-21 12:56:09,674 [WARNING] - aiogram.dispatcher - Received SIGINT signal
+2026-11-21 12:56:09,810 [INFO] - bot_russia_flowers - Bot stopped
+2026-11-21 12:56:14,647 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-21 12:56:14,653 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-21 12:56:14,654 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-21 12:56:14,671 [INFO] - bot_russia_flowers - Database initialized
+2026-11-21 12:56:14,671 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-21 12:56:14,672 [INFO] - aiogram.dispatcher - Start polling
+2026-11-21 12:56:15,105 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
+2026-11-21 12:56:57,177 [INFO] - bot_russia_flowers - DEBUG Middleware: event_type=Message, tg=9282682898
+2026-11-21 12:56:57,196 [INFO] - bot_russia_flowers - New user: 9282682898 (tsvety_po_russki)
+2026-11-21 12:56:57,204 [INFO] - bot_russia_flowers - Saved incoming message from user 9282682898: /start
+2026-11-21 12:56:57,204 [INFO] - bot_russia_flowers - User: 9282682898, event: Message
+2026-11-21 12:56:57,209 [INFO] - bot_russia_flowers - Desktop notification sent: 📩 Флорист (ID:1 | TG:9282682898)
+2026-11-21 12:56:57,651 [INFO] - aiogram.event - Update id=865972564 is handled. Duration 475 ms by bot id=9239151532
 2026-11-19 09:45:55,557 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
 2026-11-19 09:45:55,557 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
 2026-11-19 09:46:07,210 [INFO] - aiogram.dispatcher - Connection established (tryings = 1, bot id = 9239151532)
@@ -34923,3 +35208,10 @@ Original description: Too Many Requests: retry after 5
 2026-11-21 03:02:45,361 [INFO] - aiogram.dispatcher - Connection established (tryings = 7, bot id = 9239151532)
 2026-11-21 08:54:40,182 [ERROR] - aiogram.dispatcher - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 104] Connection reset by peer
 2026-11-21 08:54:40,182 [WARNING] - aiogram.dispatcher - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 9239151532)
+2026-11-21 13:05:03,742 [INFO] - bot_russia_flowers - Creating bot session with secure SSL context...
+2026-11-21 13:05:03,748 [INFO] - bot.proxy - SecureAiohttpSession initialized with TLS 1.2
+2026-11-21 13:05:03,748 [INFO] - bot_russia_flowers - Bot session created successfully
+2026-11-21 13:05:03,766 [INFO] - bot_russia_flowers - Database initialized
+2026-11-21 13:05:03,766 [INFO] - bot_russia_flowers - Bot starting polling...
+2026-11-21 13:05:03,766 [INFO] - aiogram.dispatcher - Start polling
+2026-11-21 13:05:04,370 [INFO] - aiogram.dispatcher - Run polling for bot @flowers_russia_bot id=9239151532 - 'Цветы по-русски | Магазин цветов'
