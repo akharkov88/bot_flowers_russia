@@ -8,16 +8,79 @@ from aiogram.fsm.context import FSMContext
 from sqlalchemy import select
 
 from bot.handlers.admin import notify_admin
-from bot.keyboards import get_main_keyboard, get_custom_bouquet_keyboard, pack_cb, unpack_cb
+from bot.keyboards import get_main_keyboard, get_custom_bouquet_keyboard, get_address_history_keyboard, get_phone_history_keyboard, pack_cb, unpack_cb, _short_hash
 from bot.models import Order, User
 from bot.states import CustomBouquetForm, NavigationState
 from bot.utils.logger import logger
+from bot.utils.message_saver import save_outgoing_with_keyboard
+from bot.database import async_session_factory
+
+# Menu button texts that should cancel any active FSM custom bouquet flow
+_MENU_BUTTONS = {
+    "🌸 Каталог",
+    "🛒 Корзина",
+    "📋 Мои заказы",
+    "✨ Хочу букет которого нет в каталоге",
+    "📍 Контакты",
+}
+
 
 custom_bouquet_router = Router()
 
 
-@custom_bouquet_router.message(F.text.contains("Хочу букет"))
-async def cmd_custom_bouquet(message: Message, state: FSMContext, db_session):
+async def _save_outgoing(user_id, text, keyboard=None):
+    """Save an outgoing message sent by the bot."""
+    try:
+        async with async_session_factory() as session:
+            await save_outgoing_with_keyboard(session, user_id, text, keyboard)
+    except Exception as e:
+        logger.error(f"Error saving outgoing message: {e}")
+
+
+async def _get_prev_addresses(db_session, user_id):
+    """Get unique delivery addresses from user's orders"""
+    from bot.models import Order
+    result = await db_session.execute(
+        select(Order.delivery_address)
+        .where(Order.user_id == user_id, Order.delivery_address.isnot(None), Order.delivery_address != "")
+        .order_by(Order.id.desc())
+    )
+    addresses = [row[0] for row in result.all() if row[0]]
+    # Deduplicate preserving order (most recent first)
+    seen = set()
+    unique = []
+    for addr in addresses:
+        if addr not in seen:
+            seen.add(addr)
+            unique.append(addr)
+    return unique[:5]
+
+
+async def _get_prev_phones(db_session, user_id):
+    """Get unique phone numbers from user's orders"""
+    from bot.models import Order
+    result = await db_session.execute(
+        select(Order.phone)
+        .where(Order.user_id == user_id, Order.phone.isnot(None), Order.phone != "")
+        .order_by(Order.id.desc())
+    )
+    phones = [row[0] for row in result.all() if row[0]]
+    # Deduplicate preserving order (most recent first)
+    seen = set()
+    unique = []
+    for phone in phones:
+        if phone not in seen:
+            seen.add(phone)
+            unique.append(phone)
+    return unique[:5]
+
+
+@custom_bouquet_router.message(lambda m: m.text and "Хочу букет" in m.text)
+async def cmd_custom_bouquet(message: Message, state: FSMContext, db_session, user):
+    # Если пользователь уже в процессе оформления, сбрасываем state
+    current_state = await state.get_state()
+    if current_state:
+        await state.clear()
     logger.info(f"DEBUG: Received text: {repr(message.text)}")
     # Сохраняем навигационный контекст
     back_context = "main"
@@ -38,12 +101,9 @@ async def cmd_custom_bouquet(message: Message, state: FSMContext, db_session):
     await state.update_data(back_context=back_context, cat_id=cat_id)
 
     keyboard = get_custom_bouquet_keyboard(back_context=back_context, cat_id=cat_id)
-    await message.answer(
-        "🌸 Опишите желаемый букет:\n\n"
-        "Напишите всё, что хотите: цвета, размеры, настроение, повод.\n"
-        "Например: 'Большой букет из розовых и белых пионов, нежный, для свадьбы'.",
-        reply_markup=keyboard
-    )
+    text = "🌸 Опишите желаемый букет:\n\nНапишите всё, что хотите: цвета, размеры, настроение, повод.\nНапример: 'Большой букет из розовых и белых пионов, нежный, для свадьбы'."
+    await message.answer(text, reply_markup=keyboard)
+    await _save_outgoing(user.id, text, keyboard)
 
 
 @custom_bouquet_router.callback_query(F.data.startswith('{"t":"back"'))
@@ -110,35 +170,45 @@ async def cb_custom_back(callback: CallbackQuery, state: FSMContext, db_session,
 
 
 @custom_bouquet_router.message(CustomBouquetForm.waiting_for_description)
-async def process_description(message: Message, state: FSMContext):
+async def process_description(message: Message, state: FSMContext, db_session, user):
+    # Cancel on menu buttons
+    if message.text in _MENU_BUTTONS:
+        await state.clear()
+        await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
+        return
     if message.text and message.text.lower() == "отмена":
         await state.clear()
         await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
         return
 
     description = message.text.strip()
     if len(description) < 10:
-        await message.answer(
-            "⚠️ Описание слишком короткое. Пожалуйста, опишите букет подробнее.\n\n"
-            "Минимум 10 символов.",
-            reply_markup=get_custom_bouquet_keyboard()
-        )
+        text = "⚠️ Описание слишком короткое. Пожалуйста, опишите букет подробнее.\n\nМинимум 10 символов."
+        await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+        await _save_outgoing(user.id, text)
         return
 
     await state.update_data(description=description)
     await state.set_state(CustomBouquetForm.waiting_for_budget)
-    await message.answer(
-        "💰 Укажите желаемый бюджет (необязательно).\n\n"
-        "Например: 1500-3000",
-        reply_markup=get_custom_bouquet_keyboard()
-    )
+    text = "💰 Укажите желаемый бюджет (необязательно).\n\nНапример: 1500-3000"
+    await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+    await _save_outgoing(user.id, text)
 
 
 @custom_bouquet_router.message(CustomBouquetForm.waiting_for_budget)
-async def process_budget(message: Message, state: FSMContext):
+async def process_budget(message: Message, state: FSMContext, db_session, user):
+    # Cancel on menu buttons
+    if message.text in _MENU_BUTTONS:
+        await state.clear()
+        await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
+        return
     if message.text and message.text.lower() == "отмена":
         await state.clear()
         await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
         return
 
     if message.text and message.text.lower() == "пропустить":
@@ -148,18 +218,24 @@ async def process_budget(message: Message, state: FSMContext):
 
     await state.update_data(budget=budget)
     await state.set_state(CustomBouquetForm.waiting_for_delivery_date)
-    await message.answer(
-        "📅 Укажите желаемую дату доставки (необязательно).\n\n"
-        "Формат: ДД.ММ.ГГГГ, ДД.ММ.ГГ или ДД.ММ, например: 20.11.2026, 20.11.26, 20.11",
-        reply_markup=get_custom_bouquet_keyboard()
-    )
+    text = "📅 Укажите желаемую дату доставки (необязательно).\n\nФормат: ДД.ММ.ГГГГ, ДД.ММ.ГГ или ДД.ММ, например: 20.11.2026, 20.11.26, 20.11"
+    await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+    await _save_outgoing(user.id, text)
 
 
 @custom_bouquet_router.message(CustomBouquetForm.waiting_for_delivery_date)
-async def process_delivery_date(message: Message, state: FSMContext):
+async def process_delivery_date(message: Message, state: FSMContext, db_session, user):
+    logger.info(f"DEBUG process_delivery_date: user_id={user.id}, text={repr(message.text[:50])}, current_state={await state.get_state()}")
+    # Cancel on menu buttons
+    if message.text in _MENU_BUTTONS:
+        await state.clear()
+        await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
+        return
     if message.text and message.text.lower() == "отмена":
         await state.clear()
         await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
         return
 
     if message.text and message.text.lower() == "пропустить":
@@ -168,11 +244,9 @@ async def process_delivery_date(message: Message, state: FSMContext):
     else:
         date_str = message.text.strip()
         if not re.match(r"^\d{2}\.\d{2}(\.\d{2,4})?$", date_str):
-            await message.answer(
-                "⚠️ Неверный формат даты.\n\n"
-                "Формат: ДД.ММ.ГГГГ или ДД.ММ.ГГ или ДД.ММ, например: 20.11.2026, 20.11.26, 20.11",
-                reply_markup=get_custom_bouquet_keyboard()
-            )
+            text = "⚠️ Неверный формат даты.\n\nФормат: ДД.ММ.ГГГГ или ДД.ММ.ГГ или ДД.ММ, например: 20.11.2026, 20.11.26, 20.11"
+            await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+            await _save_outgoing(user.id, text)
             return
         try:
             parts = date_str.split(".")
@@ -183,81 +257,310 @@ async def process_delivery_date(message: Message, state: FSMContext):
             delivery_date = date(year or 2000, month, day)  # dummy year for DB
             delivery_date_str = date_str
         except ValueError:
-            await message.answer("⚠️ Такая дата не существует. Проверьте день и месяц.", reply_markup=get_custom_bouquet_keyboard())
+            text = "⚠️ Такая дата не существует. Проверьте день и месяц."
+            await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+            await _save_outgoing(user.id, text)
             return
 
     await state.update_data(delivery_date=delivery_date, delivery_date_str=delivery_date_str)
     await state.set_state(CustomBouquetForm.waiting_for_time)
-    await message.answer(
-        "🕐 Введите время доставки в формате ЧЧ:ММ:\n\n"
-        "Например: 14:00",
-        reply_markup=get_custom_bouquet_keyboard()
-    )
+    text = "🕐 Введите время доставки в формате ЧЧ:ММ:\n\nНапример: 14:00"
+    await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+    await _save_outgoing(user.id, text)
 
 
 @custom_bouquet_router.message(CustomBouquetForm.waiting_for_time)
-async def process_time(message: Message, state: FSMContext):
+async def process_time(message: Message, state: FSMContext, db_session, user):
+    logger.info(f"DEBUG process_time: user_id={user.id}, text={repr(message.text[:50])}, current_state={await state.get_state()}")
+    # Cancel on menu buttons
+    if message.text in _MENU_BUTTONS:
+        await state.clear()
+        await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
+        return
     if message.text and message.text.lower() == "отмена":
         await state.clear()
         await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
         return
+
+    # Guard against duplicate messages
+    data = await state.get_data()
+    if data.get("_time_sent"):
+        return
+    await state.update_data(_time_sent=True)
 
     if message.text and message.text.lower() == "пропустить":
         time_str = None
     else:
         time_str = message.text.strip()
+        # Validate time format ЧЧ:ММ
+        if not re.match(r"^\d{2}:\d{2}$", time_str):
+            await state.update_data(_time_sent=False)
+            text = "⚠️ Неверный формат времени.\n\nФормат: ЧЧ:ММ, например: 14:00"
+            await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+            await _save_outgoing(user.id, text)
+            return
+        try:
+            hour, minute = map(int, time_str.split(":"))
+            if not (0 <= hour <= 23 and 0 <= minute <= 59):
+                raise ValueError
+        except ValueError:
+            await state.update_data(_time_sent=False)
+            text = "⚠️ Такое время не существует. Проверьте часы и минуты."
+            await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+            await _save_outgoing(user.id, text)
+            return
 
     await state.update_data(time=time_str)
-    await state.set_state(CustomBouquetForm.waiting_for_address)
-    await message.answer(
-        "📍 Введите адрес доставки:\n\n"
-        "Например: г. Нижний Новгород, ул. Белинского, д. 10, кв. 5",
-        reply_markup=get_custom_bouquet_keyboard()
-    )
+
+    # Запрашиваем предыдущие адреса и показываем клавиатуру
+    prev_addresses = await _get_prev_addresses(db_session, user.id)
+
+    if prev_addresses:
+        await state.update_data(prev_addresses=prev_addresses, _address_sent=True)
+        await state.set_state(CustomBouquetForm.waiting_for_address)
+        logger.info(f"DEBUG process_time: set state=waiting_for_address with prev_addresses, _address_sent=True")
+        text = "📍 Выберите адрес или введите новый:"
+        keyboard = get_address_history_keyboard(prev_addresses, prefix="custom_")
+        await message.answer(text, reply_markup=keyboard)
+        await _save_outgoing(user.id, text, keyboard)
+    else:
+        await state.update_data(_address_sent=True)
+        await state.set_state(CustomBouquetForm.waiting_for_address)
+        logger.info(f"DEBUG process_time: set state=waiting_for_address without prev_addresses, _address_sent=True")
+        text = "📍 Введите адрес доставки:\n\nНапример: г. Нижний Новгород, ул. Белинского, д. 10, кв. 5"
+        await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+        await _save_outgoing(user.id, text)
 
 
 @custom_bouquet_router.message(CustomBouquetForm.waiting_for_address)
-async def process_address(message: Message, state: FSMContext):
+async def process_address(message: Message, state: FSMContext, db_session, user):
+    _data = await state.get_data()
+    logger.info(f"DEBUG process_address: user_id={user.id}, text={repr(message.text[:50])}, state={await state.get_state()}, _address_sent={_data.get('_address_sent')}")
+    # Cancel on menu buttons
+    if message.text in _MENU_BUTTONS:
+        await state.clear()
+        await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
+        return
     if message.text and message.text.lower() == "отмена":
         await state.clear()
         await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
         return
 
-    await state.update_data(address=message.text)
-    await state.set_state(CustomBouquetForm.waiting_for_phone)
-    await message.answer(
-        "📞 Введите номер телефона для связи:\n\n"
-        "Например: +7 (996) 041-22-27",
-        reply_markup=get_custom_bouquet_keyboard()
+    data = await state.get_data()
+
+    # Check if user chose to enter new address via callback ("Другой адрес")
+    if data.get("chose_new_address"):
+        await state.update_data(
+            address=message.text,
+            chose_new_address=False
+        )
+        await state.set_state(CustomBouquetForm.waiting_for_phone)
+        # Get previous phones for user
+        internal_user = None
+        result = await db_session.execute(select(User).where(User.telegram_id == user.telegram_id))
+        internal_user = result.scalar_one_or_none()
+        if internal_user:
+            prev_phones = await _get_prev_phones(db_session, internal_user.id)
+            if prev_phones:
+                await state.update_data(prev_phones=prev_phones)
+                text = "📞 Выберите номер или введите новый:"
+                keyboard = get_phone_history_keyboard(prev_phones, prefix="custom_")
+                await message.answer(text, reply_markup=keyboard)
+                await _save_outgoing(user.id, text, keyboard)
+            else:
+                text = "📞 Введите номер телефона для связи:\n\nНапример: +7 (996) 041-22-27"
+                await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+                await _save_outgoing(user.id, text)
+        return
+
+    # Check if already sent the prompt (_address_sent=True) — this is the user's address
+    if data.get("_address_sent") and not data.get("chose_new_address"):
+        await state.update_data(
+            address=message.text,
+            _address_sent=False
+        )
+        await state.set_state(CustomBouquetForm.waiting_for_phone)
+        # Get previous phones for user
+        internal_user = None
+        result = await db_session.execute(select(User).where(User.telegram_id == user.telegram_id))
+        internal_user = result.scalar_one_or_none()
+        if internal_user:
+            prev_phones = await _get_prev_phones(db_session, internal_user.id)
+            if prev_phones:
+                await state.update_data(prev_phones=prev_phones)
+                text = "📞 Выберите номер или введите новый:"
+                keyboard = get_phone_history_keyboard(prev_phones, prefix="custom_")
+                await message.answer(text, reply_markup=keyboard)
+                await _save_outgoing(user.id, text, keyboard)
+            else:
+                text = "📞 Введите номер телефона для связи:\n\nНапример: +7 (996) 041-22-27"
+                await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+                await _save_outgoing(user.id, text)
+        return
+
+    # Should not reach here — _address_sent is always True when entering waiting_for_address
+    # Fallback: treat as address input
+    await state.update_data(
+        address=message.text,
+        _address_sent=False
     )
+    await state.set_state(CustomBouquetForm.waiting_for_phone)
+    internal_user = None
+    result = await db_session.execute(select(User).where(User.telegram_id == user.telegram_id))
+    internal_user = result.scalar_one_or_none()
+    if internal_user:
+        prev_phones = await _get_prev_phones(db_session, internal_user.id)
+        if prev_phones:
+            await state.update_data(prev_phones=prev_phones)
+            text = "📞 Выберите номер или введите новый:"
+            keyboard = get_phone_history_keyboard(prev_phones, prefix="custom_")
+            await message.answer(text, reply_markup=keyboard)
+            await _save_outgoing(user.id, text, keyboard)
+        else:
+            text = "📞 Введите номер телефона для связи:\n\nНапример: +7 (996) 041-22-27"
+            await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+            await _save_outgoing(user.id, text)
+
+
+@custom_bouquet_router.callback_query(F.data.contains('custom_addr'))
+async def cb_custom_address(callback: CallbackQuery, state: FSMContext, db_session, user):
+    data = unpack_cb(callback.data)
+    action = data.get("action", "")
+
+    if action == "select":
+        hash_id = data.get("hash", "")
+        # Get prev_addresses from FSM state, not from callback data
+        fsm_data = await state.get_data()
+        prev_addresses = fsm_data.get("prev_addresses", [])
+        address = None
+        for addr in prev_addresses:
+            if _short_hash(addr) == hash_id:
+                address = addr
+                break
+        if address:
+            await state.update_data(address=address, _address_sent=False)
+            await state.set_state(CustomBouquetForm.waiting_for_phone)
+            # Get previous phones for user
+            result = await db_session.execute(select(User).where(User.telegram_id == callback.from_user.id))
+            internal_user = result.scalar_one_or_none()
+            prev_phones = []
+            if internal_user:
+                prev_phones = await _get_prev_phones(db_session, internal_user.id)
+            if prev_phones:
+                await state.update_data(prev_phones=prev_phones)
+                text = "📞 Выберите номер или введите новый:"
+                keyboard = get_phone_history_keyboard(prev_phones, prefix="custom_")
+                await callback.message.answer(text, reply_markup=keyboard)
+                await _save_outgoing(user.id, text, keyboard)
+            else:
+                text = "📞 Введите номер телефона для связи:\n\nНапример: +7 (996) 041-22-27"
+                await callback.message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+                await _save_outgoing(user.id, text)
+        else:
+            await callback.answer("Ошибка", show_alert=True)
+    elif action == "new":
+        await state.update_data(chose_new_address=True, _address_sent=False)
+        await callback.answer()
+        text = "✏️ Введите новый адрес в чат:"
+        await callback.message.answer(text)
+        await _save_outgoing(user.id, text)
+        return
+
+    await callback.answer()
 
 
 @custom_bouquet_router.message(CustomBouquetForm.waiting_for_phone)
-async def process_phone(message: Message, state: FSMContext):
+async def process_phone(message: Message, state: FSMContext, db_session, user):
+    # Cancel on menu buttons
+    if message.text in _MENU_BUTTONS:
+        await state.clear()
+        await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
+        return
     if message.text and message.text.lower() == "отмена":
         await state.clear()
         await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
         return
 
+    data = await state.get_data()
+
+    # Guard against duplicate messages
+    if data.get("_phone_sent"):
+        return
+    await state.update_data(_phone_sent=True)
+
+    # Check if user chose to enter new phone
+    if data.get("chose_new_phone"):
+        await state.update_data(
+            phone=message.text.strip(),
+            chose_new_phone=False,
+        )
+        await state.set_state(CustomBouquetForm.waiting_for_comment)
+        text = "💬 Добавьте комментарий к заказу (необязательно):\n\nНапример: позвонить за час, код домофона 123"
+        await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+        await _save_outgoing(user.id, text)
+        return
+
+    # User typed a phone number manually
     phone = message.text.strip()
-    if not re.match(r"^[\+]?[\d\s\-\(\)]{7,20}$", phone):
-        await message.answer("⚠️ Неверный формат телефона. Введите номер ещё раз.", reply_markup=get_custom_bouquet_keyboard())
-        return
-
     await state.update_data(phone=phone)
     await state.set_state(CustomBouquetForm.waiting_for_comment)
-    await message.answer(
-        "💬 Добавьте комментарий к заказу (необязательно):\n\n"
-        "Например: позвонить за час, код домофона 123",
-        reply_markup=get_custom_bouquet_keyboard()
-    )
+    text = "💬 Добавьте комментарий к заказу (необязательно):\n\nНапример: позвонить за час, код домофона 123"
+    await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+    await _save_outgoing(user.id, text)
+
+
+@custom_bouquet_router.callback_query(F.data.contains('custom_phone'))
+async def cb_custom_phone(callback: CallbackQuery, state: FSMContext, db_session, user):
+    data = unpack_cb(callback.data)
+    action = data.get("action", "")
+
+    if action == "select":
+        hash_id = data.get("hash", "")
+        # Get prev_phones from FSM state, not from callback data
+        fsm_data = await state.get_data()
+        prev_phones = fsm_data.get("prev_phones", [])
+        phone = None
+        for p in prev_phones:
+            if _short_hash(p) == hash_id:
+                phone = p
+                break
+        if phone:
+            await state.update_data(phone=phone, _phone_sent=False)
+            await state.set_state(CustomBouquetForm.waiting_for_comment)
+            text = "💬 Добавьте комментарий к заказу (необязательно):\n\nНапример: позвонить за час, код домофона 123"
+            await callback.message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+            await _save_outgoing(user.id, text)
+        else:
+            await callback.answer("Ошибка", show_alert=True)
+    elif action == "new":
+        await state.update_data(chose_new_phone=True, _phone_sent=False)
+        await callback.answer()
+        text = "✏️ Введите новый номер в чат:"
+        await callback.message.answer(text)
+        await _save_outgoing(user.id, text)
+        return
+
+    await callback.answer()
 
 
 @custom_bouquet_router.message(CustomBouquetForm.waiting_for_comment)
 async def process_comment(message: Message, state: FSMContext, db_session, user, bot: Bot):
+    # Cancel on menu buttons
+    if message.text in _MENU_BUTTONS:
+        await state.clear()
+        await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
+        return
     if message.text and message.text.lower() == "отмена":
         await state.clear()
         await message.answer("❌ Отменено.", reply_markup=get_main_keyboard())
+        await _save_outgoing(user.id, "❌ Отменено.")
         return
 
     data = await state.get_data()
@@ -312,7 +615,7 @@ async def process_comment(message: Message, state: FSMContext, db_session, user,
     time_str_display = time_str if time_str else "не указано"
     budget_str = budget if budget else "не указан"
 
-    await message.answer(
+    final_text = (
         f"✅ Ваша заявка на индивидуальный букет принята!\n\n"
         f"📝 Заказ #{order.id}\n\n"
         f"📝 Описание: {description}\n"
@@ -322,7 +625,7 @@ async def process_comment(message: Message, state: FSMContext, db_session, user,
         f"📍 Адрес: {address}\n"
         f"📞 Телефон: {phone}\n"
         f"💬 Комментарий: {comment or '—'}\n\n"
-        f"🌸 Мы свяжемся с вами для обсуждения деталей и подтверждения стоимости.",
-        reply_markup=get_main_keyboard(),
-        parse_mode="HTML"
+        f"🌸 Мы свяжемся с вами для обсуждения деталей и подтверждения стоимости."
     )
+    await message.answer(final_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
+    await _save_outgoing(user.id, final_text, get_main_keyboard())

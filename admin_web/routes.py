@@ -969,7 +969,7 @@ async def customer_chat_page(request: Request, user_id: int):
         result = await session.execute(
             select(Message).where(Message.user_id == user_id)
             .order_by(Message.created_at.desc())
-            .limit(50)
+            .limit(500)
         )
         messages = list(reversed(result.scalars().all()))
 
@@ -1102,7 +1102,7 @@ async def get_chat_messages(user_id: int):
         result = await session.execute(
             select(Message).where(Message.user_id == user_id)
             .order_by(Message.created_at.desc())
-            .limit(50)
+            .limit(500)
         )
         messages = list(reversed(result.scalars().all()))
 
@@ -1114,6 +1114,7 @@ async def get_chat_messages(user_id: int):
             "image_url": m.image_url,
             "callback_data": m.callback_data,
             "formatted_callback": format_callback_data(m.callback_data) if m.callback_data else "",
+            "keyboard": m.keyboard,
             "created_at": m.created_at.replace(tzinfo=MSK).strftime("%d.%m.%Y %H:%M:%S") if m.created_at else "",
         }
         for m in messages
@@ -1508,6 +1509,17 @@ async def process_post_sending(post_id: int):
                         chat_id=recipient.telegram_id,
                         text=post.text
                     )
+
+                # Create Message record for admin chat view
+                async with async_session_factory() as msg_session:
+                    msg = Message(
+                        user_id=recipient.user_id,
+                        direction="outgoing",
+                        text=f"📢 Пост: {post.title}\n\n{post.text}",
+                    )
+                    msg_session.add(msg)
+                    await msg_session.commit()
+                    logger.info(f"Saved outgoing post message for user {recipient.user_id}: {post.title}")
 
                 # Update recipient
                 async with async_session_factory() as session:

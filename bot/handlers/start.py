@@ -7,6 +7,25 @@ from bot.keyboards import get_main_keyboard
 start_router = Router()
 
 
+# Known menu button texts that should be handled by other routers
+_MENU_BUTTONS = {
+    "🌸 Каталог",
+    "🛒 Корзина",
+    "📋 Мои заказы",
+    "✨ Хочу букет которого нет в каталоге",
+    "📍 Контакты",
+}
+
+
+# Catch-all handler for any unmatched messages - ensures middleware runs
+@start_router.message(F.text & ~F.text.in_(_MENU_BUTTONS))
+async def msg_any_text(message: Message):
+    """Handle any text message that doesn't match other handlers.
+    FSM handlers (order form, etc.) take priority via aiogram's router order.
+    """
+    pass
+
+
 @start_router.message(Command("start"))
 async def cmd_start(message: Message):
     welcome_text = (

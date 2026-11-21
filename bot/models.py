@@ -142,6 +142,7 @@ class Message(Base):
     text = Column(Text, nullable=True)
     image_url = Column(String(500), nullable=True)
     callback_data = Column(Text, nullable=True)  # JSON callback data for button clicks
+    keyboard = Column(Text, nullable=True)  # JSON keyboard data (reply/inline buttons)
     sent = Column(Boolean, default=False)
     created_at = Column(DateTime, default=lambda: datetime.now())
 

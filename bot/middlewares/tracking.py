@@ -1,4 +1,5 @@
 import asyncio
+import types
 from typing import Any, Callable, Dict, List
 
 from aiogram import BaseMiddleware, Bot, Dispatcher
@@ -11,6 +12,69 @@ import json
 from bot.models import Message, User
 from bot.utils.logger import logger
 from bot.utils.desktop_notifications import send_desktop_notification
+
+
+class OutgoingMessageMiddleware(BaseMiddleware):
+    """Save outgoing messages by wrapping bot.__call__ (API interceptor)."""
+    def __init__(self, bot: Bot):
+        super().__init__()
+        self.bot = bot
+        self._saved = False
+        # Store the original __call__ as a regular attribute
+        self._original_call = bot.__call__
+
+    async def _save_outgoing(self, chat_id: int, text: str, keyboard=None):
+        """Save outgoing message to database."""
+        try:
+            async with async_session_factory() as session:
+                result = await session.execute(select(User).where(User.telegram_id == chat_id))
+                user = result.scalar_one_or_none()
+                if not user:
+                    return
+
+                msg = Message(
+                    user_id=user.id,
+                    direction="outgoing",
+                    text=text,
+                    keyboard=json.dumps(keyboard, ensure_ascii=False) if keyboard else None,
+                )
+                session.add(msg)
+                await session.commit()
+                logger.info(f"Saved outgoing message to user {user.id} (tg:{chat_id}): {text[:50]}")
+        except Exception as e:
+            logger.error(f"Failed to save outgoing message to chat {chat_id}: {e}")
+
+    async def _patched_call(self, method, *args, **kwargs):
+        """Wrapper for bot.__call__ that intercepts SendMessage."""
+        from aiogram.methods import SendMessage
+        
+        chat_id = None
+        text = None
+        keyboard = None
+        
+        if isinstance(method, SendMessage):
+            chat_id = method.chat
+            text = method.text
+            keyboard = method.reply_markup
+        
+        # Save to DB (non-blocking)
+        if chat_id and text and not self._saved:
+            self._saved = True
+            try:
+                asyncio.create_task(self._save_outgoing(chat_id, text, keyboard))
+            finally:
+                self._saved = False
+        
+        return await self._original_call(method, *args, **kwargs)
+
+    def patch_bot(self):
+        """Patch the bot's __call__ method."""
+        import types
+        self.bot.__call__ = types.MethodType(self._patched_call, self.bot)
+
+    async def __call__(self, handler, event, data):
+        """Pass-through middleware."""
+        return await handler(event, data)
 
 
 class TrackingMiddleware(BaseMiddleware):
@@ -27,7 +91,9 @@ class TrackingMiddleware(BaseMiddleware):
         if isinstance(event, (TgMessage, CallbackQuery)):
             tg = event.from_user
 
-        logger.info(f"DEBUG Middleware: event_type={type(event).__name__}, tg={tg.id if tg else None}")
+        logger.info(f"DEBUG Middleware START: event_type={type(event).__name__}, tg={tg.id if tg else None}, event={event}")
+        if isinstance(event, TgMessage):
+            logger.info(f"DEBUG Middleware: message text={repr(event.text[:50]) if event.text else None}, chat_type={event.chat.type if event.chat else None}")
 
         if tg:
             async with async_session_factory() as session:
@@ -71,15 +137,19 @@ class TrackingMiddleware(BaseMiddleware):
 
                 # Save incoming text messages from users
                 if isinstance(event, TgMessage) and event.text and event.chat.type == "private":
-                    msg = Message(
-                        user_id=user.id,
-                        direction="incoming",
-                        text=event.text,
-                    )
-                    session.add(msg)
-
-                    await session.commit()
-                    logger.info(f"Saved incoming message from user {tg.id}: {event.text[:50]}")
+                    logger.info(f"DEBUG: Saving incoming message from user {tg.id}: {event.text[:50]}")
+                    try:
+                        msg = Message(
+                            user_id=user.id,
+                            direction="incoming",
+                            text=event.text,
+                        )
+                        session.add(msg)
+                        await session.commit()
+                        logger.info(f"Saved incoming message from user {tg.id}: {event.text[:50]}")
+                    except Exception as e:
+                        logger.error(f"Failed to save incoming message from user {tg.id}: {e}")
+                        await session.rollback()
 
                     # Send desktop push notification (non-blocking)
                     user_name_display = user.first_name or user.username or str(tg.id)
@@ -94,8 +164,9 @@ class TrackingMiddleware(BaseMiddleware):
                 if isinstance(event, CallbackQuery) and event.data:
                     try:
                         cb_data = json.loads(event.data)
-                        cb_type = cb_data.get("type", "unknown")
-                        cb_action = cb_data.get("action", "unknown")
+                        # Support both short keys (t, a) and long keys (type, action)
+                        cb_type = cb_data.get("type", cb_data.get("t", "unknown"))
+                        cb_action = cb_data.get("action", cb_data.get("a", "unknown"))
                     except (json.JSONDecodeError, AttributeError):
                         cb_data = None
                         cb_type = "unknown"
@@ -109,7 +180,7 @@ class TrackingMiddleware(BaseMiddleware):
                     )
                     session.add(msg)
                     await session.commit()
-                    logger.info(f"Saved callback {cb_type}:{cb_action} from user {tg.id}")
+                    logger.info(f"Saved callback {cb_type}:{cb_action} from user {tg.id}, data={event.data[:100]}")
 
                 logger.info(f"User: {tg.id}, event: {type(event).__name__}")
 

@@ -1,4 +1,7 @@
+import hashlib
 import json
+from typing import List
+
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -190,19 +193,56 @@ def get_admin_order_status_keyboard(order) -> InlineKeyboardMarkup:
 
 
 def get_custom_bouquet_keyboard(back_context: str = "main", cat_id: int = 0) -> InlineKeyboardMarkup:
-    """Клавиатура с кнопкой Назад для кастомного букета"""
-    if back_context == "catalog" and cat_id > 0:
-        # Возвращаемся к продуктам категории
-        return InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="back", action="back", back_context="catalog", cat_id=cat_id))]
+    """Клавиатура без кнопки Назад для кастомного букета (линейный процесс)"""
+    # Возвращаем пустую клавиатуру без кнопок
+    return InlineKeyboardMarkup(inline_keyboard=[])
+
+
+def _short_hash(value: str) -> str:
+    """Create a short unique hash for a string (8 chars)"""
+    return hashlib.md5(value.encode()).hexdigest()[:8]
+
+
+def get_address_history_keyboard(addresses: List[str], prefix: str = "") -> InlineKeyboardMarkup:
+    """Клавиатура с предыдущими адресами доставки
+    
+    Args:
+        addresses: List of addresses
+        prefix: Prefix for callback data type to avoid router conflicts (e.g. "custom_")
+    """
+    buttons = []
+    for addr in addresses:
+        hash_id = _short_hash(addr)
+        buttons.append([
+            InlineKeyboardButton(
+                text=f"📍 {addr}",
+                callback_data=pack_cb(type=f"{prefix}addr", action="select", hash=hash_id)
+            )
         ])
-    elif back_context == "catalog":
-        # Возвращаемся к категориям
-        return InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="back", action="back", back_context="catalog", cat_id=0))]
+    buttons.append([
+        InlineKeyboardButton(text="➕ Ввести новый адрес", callback_data=pack_cb(type=f"{prefix}addr", action="new"))
+    ])
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_phone_history_keyboard(phones: List[str], prefix: str = "") -> InlineKeyboardMarkup:
+    """Клавиатура с предыдущими номерами телефонов
+    
+    Args:
+        phones: List of phone numbers
+        prefix: Prefix for callback data type to avoid router conflicts (e.g. "custom_")
+    """
+    buttons = []
+    for phone in phones:
+        display = phone if len(phone) <= 20 else phone[:17] + "..."
+        hash_id = _short_hash(phone)
+        buttons.append([
+            InlineKeyboardButton(
+                text=f"📞 {display}",
+                callback_data=pack_cb(type=f"{prefix}phone", action="select", hash=hash_id)
+            )
         ])
-    else:
-        # Возвращаемся в главное меню
-        return InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="back", action="back", back_context="main", cat_id=0))]
-        ])
+    buttons.append([
+        InlineKeyboardButton(text="➕ Ввести новый номер", callback_data=pack_cb(type=f"{prefix}phone", action="new"))
+    ])
+    return InlineKeyboardMarkup(inline_keyboard=buttons)

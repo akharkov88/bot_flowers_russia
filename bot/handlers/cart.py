@@ -6,11 +6,22 @@ from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 from sqlalchemy import select
 
-from bot.keyboards import pack_cb, unpack_cb, get_cart_keyboard, get_main_keyboard
-from bot.models import Product, Cart, User
+from bot.keyboards import pack_cb, unpack_cb, get_cart_keyboard, get_main_keyboard, get_address_history_keyboard
+from bot.models import Product, Cart, User, Order
 from bot.states import OrderForm
 from bot.handlers.navigation import save_cart_back_context, get_cart_back_context
 from bot.utils.logger import logger
+from bot.utils.message_saver import save_outgoing_with_keyboard
+from bot.database import async_session_factory
+
+
+async def _save_outgoing(user_id, text, keyboard=None):
+    """Save an outgoing message sent by the bot."""
+    try:
+        async with async_session_factory() as session:
+            await save_outgoing_with_keyboard(session, user_id, text, keyboard)
+    except Exception as e:
+        logger.error(f"Error saving outgoing message: {e}")
 
 cart_router = Router()
 
@@ -23,8 +34,9 @@ async def get_or_create_cart(session, user_id: int, telegram_id: int):
             Cart.status == "active"
         ).order_by(Cart.updated_at.desc())
     )
-    cart = result.scalar_one_or_none()
-    if not cart:
+    carts = result.scalars().all()
+
+    if not carts:
         cart = Cart(
             user_id=user_id,
             telegram_id=telegram_id,
@@ -35,7 +47,19 @@ async def get_or_create_cart(session, user_id: int, telegram_id: int):
         session.add(cart)
         await session.commit()
         await session.refresh(cart)
-    return cart
+        return cart
+
+    # Merge duplicate carts into the most recent one
+    primary = carts[0]
+    if len(carts) > 1:
+        for duplicate in carts[1:]:
+            dup_data = json.loads(duplicate.data) if duplicate.data else {}
+            merged = {**(json.loads(primary.data) if primary.data else {}), **dup_data}
+            primary.data = json.dumps(merged, ensure_ascii=False)
+            duplicate.status = "merged"
+            await session.commit()
+
+    return primary
 
 
 async def recalculate_cart(session, cart):
@@ -234,6 +258,8 @@ async def cb_cart_action(callback: CallbackQuery, bot: Bot, state: FSMContext, d
         await refresh_cart_message(callback, db_session, cart)
 
     elif action == "checkout":
+
+
         # Get user and cart from DB
         result = await db_session.execute(select(User).where(User.telegram_id == callback.from_user.id))
         user = result.scalar_one_or_none()
@@ -248,12 +274,40 @@ async def cb_cart_action(callback: CallbackQuery, bot: Bot, state: FSMContext, d
             await callback.answer("Корзина пуста!")
             return
 
-        await state.set_state(OrderForm.waiting_for_address)
-        await callback.message.answer(
-            "📍 Введите адрес доставки:\n\n"
-            "Например: г. Нижний Новгород, ул. Белинского, д. 10, кв. 5"
+        # Get previous addresses to decide which message to show
+        prev_addresses_result = await db_session.execute(
+            select(Order.delivery_address)
+            .where(Order.user_id == user.id, Order.delivery_address.isnot(None), Order.delivery_address != "")
+            .order_by(Order.id.desc())
         )
-        await callback.answer()
+        addresses = [row[0] for row in prev_addresses_result.all() if row[0]]
+        # Deduplicate preserving order
+        seen = set()
+        unique = []
+        for addr in addresses:
+            if addr not in seen:
+                seen.add(addr)
+                unique.append(addr)
+        prev_addresses = unique[:5]
+
+        await state.set_state(OrderForm.waiting_for_address)
+        await state.update_data(prev_addresses=prev_addresses, cart=cart, _address_sent=True)
+
+        if prev_addresses:
+            text = "📍 Выберите адрес или введите новый:"
+            keyboard = get_address_history_keyboard(prev_addresses)
+            try:
+                await callback.message.edit_text(text, reply_markup=keyboard)
+            except TelegramBadRequest:
+                await callback.message.answer(text, reply_markup=keyboard)
+            await _save_outgoing(user.id, text, keyboard)
+        else:
+            text = "📍 Введите адрес доставки:\n\nНапример: г. Нижний Новгород, ул. Белинского, д. 10, кв. 5"
+            try:
+                await callback.message.edit_text(text)
+            except TelegramBadRequest:
+                await callback.message.answer(text)
+            await _save_outgoing(user.id, text)
 
 
 @cart_router.callback_query(F.data.startswith('{"t":"back"'))

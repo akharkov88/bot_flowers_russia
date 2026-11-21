@@ -36,15 +36,17 @@ async def main():
     
     dp = Dispatcher()
 
-    # Setup outgoing message observer (saves bot replies to DB)
-    # Outgoing messages are now saved directly in handlers via save_outgoing()
+    # Register handlers FIRST
+    register_handlers(dp)
 
-    # Register middleware
+    # Register middleware AFTER routers
     dp.message.middleware(TrackingMiddleware(admin_ids=settings.admin_ids_list))
     dp.callback_query.middleware(TrackingMiddleware(admin_ids=settings.admin_ids_list))
 
-    # Register handlers
-    register_handlers(dp)
+    # Patch bot to intercept outgoing messages
+    from bot.middlewares.tracking import OutgoingMessageMiddleware
+    outgoing_mw = OutgoingMessageMiddleware(bot)
+    outgoing_mw.patch_bot()
 
     # Initialize database
     await init_db()
@@ -72,9 +74,9 @@ async def main():
                     for notif in pending:
                         try:
                             if notif.telegram_id:
+                                # Send to user (personal chat)
                                 if notif.image_url:
                                     logger.info(f"Processing photo notification {notif.id}: image_url={notif.image_url}, text={notif.text[:50]}")
-                                    # Convert /static/uploads/filename.jpg to local file path
                                     local_path = None
                                     if notif.image_url.startswith("/static/uploads/"):
                                         filename = notif.image_url.split("/")[-1]
@@ -104,21 +106,58 @@ async def main():
                                     )
                                     logger.info(f"Notification sent to user {notif.telegram_id}: {notif.text[:80]}")
                                 notif.sent = True
+                            elif notif.chat_id:
+                                # Send to group/chat (e.g. order status updates)
+                                if notif.image_url:
+                                    local_path = None
+                                    if notif.image_url.startswith("/static/uploads/"):
+                                        filename = notif.image_url.split("/")[-1]
+                                        uploads_dir = os.path.join(
+                                            os.path.dirname(os.path.dirname(__file__)),
+                                            "admin_web", "static", "uploads"
+                                        )
+                                        local_path = os.path.join(uploads_dir, filename)
+
+                                    if local_path and os.path.exists(local_path):
+                                        await bot.send_photo(
+                                            chat_id=notif.chat_id,
+                                            photo=FSInputFile(local_path),
+                                            caption=notif.text or None,
+                                        )
+                                        logger.info(f"Photo notification sent to chat {notif.chat_id}")
+                                    else:
+                                        logger.warning(f"Photo file not found: {local_path} for notification {notif.id}")
+                                        notif.sent = True
+                                else:
+                                    await bot.send_message(
+                                        chat_id=notif.chat_id,
+                                        text=notif.text or "",
+                                    )
+                                    logger.info(f"Notification sent to chat {notif.chat_id}: {notif.text[:80]}")
+                                notif.sent = True
                             else:
                                 notif.sent = True
-                                logger.info(f"Notification skipped (no chat_id): {notif.text[:80]}")
-                        except TelegramForbiddenError:
-                            # User blocked the bot
-                            logger.warning(f"User blocked the bot: telegram_id={notif.telegram_id}")
-                            if notif.user_id:
-                                result = await session.execute(select(User).where(User.id == notif.user_id))
-                                user = result.scalar_one_or_none()
-                                if user:
-                                    user.user_blocked_bot = True
-                                    logger.info(f"Marked user {user.id} (telegram_id={notif.telegram_id}) as blocked the bot")
+                                logger.info(f"Notification skipped (no telegram_id or chat_id): {notif.text[:80]}")
+                        except TelegramForbiddenError as e:
+                            # Access denied to user or chat
+                            if notif.telegram_id:
+                                logger.warning(f"User blocked the bot or access denied: telegram_id={notif.telegram_id}: {e}")
+                                if notif.user_id:
+                                    result = await session.execute(select(User).where(User.id == notif.user_id))
+                                    user = result.scalar_one_or_none()
+                                    if user:
+                                        user.user_blocked_bot = True
+                                        logger.info(f"Marked user {user.id} (telegram_id={notif.telegram_id}) as blocked the bot")
+                            else:
+                                logger.warning(f"Cannot send to chat {notif.chat_id}: access denied or bot removed: {e}")
                             notif.sent = True
                         except TelegramAPIError as e:
-                            logger.warning(f"Failed to send notification to {notif.telegram_id}: {e}")
+                            if notif.telegram_id:
+                                logger.warning(f"Failed to send notification to user {notif.telegram_id}: {e}")
+                            elif notif.chat_id:
+                                logger.warning(f"Failed to send notification to chat {notif.chat_id}: {e}")
+                            else:
+                                logger.warning(f"Failed to send notification (no target): {e}")
 
                     if pending:
                         await session.commit()
@@ -353,6 +392,21 @@ async def main():
                                             text=post.text,
                                             reply_markup=keyboard
                                         )
+
+                                    # Create Message record for admin chat view
+                                    try:
+                                        from bot.models import Message as BotMessage
+                                        async with async_session_factory() as msg_session:
+                                            msg = BotMessage(
+                                                user_id=recipient.user_id,
+                                                direction="outgoing",
+                                                text=f"📢 Пост: {post.title}\n\n{post.text}",
+                                            )
+                                            msg_session.add(msg)
+                                            await msg_session.commit()
+                                            logger.info(f"Saved outgoing post message for user {recipient.user_id}: {post.title}")
+                                    except Exception as e:
+                                        logger.error(f"Error saving post message for user {recipient.user_id}: {e}")
 
                                     # Update recipient
                                     async with async_session_factory() as session:

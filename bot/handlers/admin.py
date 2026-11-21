@@ -151,6 +151,9 @@ async def cb_admin_action(callback: CallbackQuery, bot: Bot, db_session):
         await callback.answer(f"Статус изменён на {new_status_text}")
         await callback.message.answer(f"✅ Заказ #{order_id} → {new_status_text}")
 
+        # Notify order chat
+        await notify_chat(bot, settings.order_chat_id, order_id, new_status)
+
     elif action == "product_detail":
         prod_id = int(data["id"])
 

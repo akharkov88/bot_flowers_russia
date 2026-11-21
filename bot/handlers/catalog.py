@@ -25,18 +25,12 @@ from bot.database import async_session_factory
 import os
 
 
-async def save_outgoing(user_id, text):
+async def save_outgoing(user_id, text, keyboard=None):
     """Save an outgoing message sent by the bot."""
     try:
         async with async_session_factory() as session:
-            msg = BotMessage(
-                user_id=user_id,
-                direction="outgoing",
-                text=text,
-            )
-            session.add(msg)
-            await session.commit()
-            logger.info(f"Saved outgoing message to user {user_id}: {text[:50]}")
+            from bot.utils.message_saver import save_outgoing_with_keyboard
+            await save_outgoing_with_keyboard(session, user_id, text, keyboard)
     except Exception as e:
         logger.error(f"Error saving outgoing message: {e}")
 
@@ -105,8 +99,9 @@ async def msg_catalog(message: Message, state: FSMContext, db_session):
             logger.info(f"DEBUG catalog: initialized stack with categories")
         await push_navigation(state, SCREEN_CATEGORIES)
         text2 = "🌸 Выберите категорию:"
-        await save_outgoing(user.id, text2)
-        await message.answer(text2, reply_markup=get_categories_keyboard(categories))
+        keyboard = get_categories_keyboard(categories)
+        await save_outgoing(user.id, text2, keyboard)
+        await message.answer(text2, reply_markup=keyboard)
     except Exception as e:
         logger.error(f"Error in msg_catalog: {e}")
         text_err = "❌ Произошла ошибка при загрузке каталога."
@@ -139,8 +134,19 @@ async def cb_handle_catalog(callback: CallbackQuery, bot: Bot, db_session, state
             await save_outgoing(user.id, "🌸 В этой категории пока нет товаров.")
             return
 
+        user = callback.from_user
+        async with async_session_factory() as session:
+            user_result = await session.execute(select(User).where(User.telegram_id == user.id))
+            internal_user = user_result.scalar_one_or_none()
+            if internal_user:
+                products_kb = get_products_keyboard(products, cat_id=cat_id)
+                cat_text = f"🌸 {category.name}\n\nВыберите букет:"
+                await save_outgoing(internal_user.id, cat_text, products_kb)
+
         await push_navigation(state, SCREEN_PRODUCTS, cat_id=cat_id)
 
+        products_kb = get_products_keyboard(products, cat_id=cat_id)
+        cat_text = f"🌸 {category.name}\n\nВыберите букет:"
         if category.image_url:
             cat_image_path = get_image_path(category.image_url)
             if cat_image_path and os.path.exists(cat_image_path):
@@ -148,23 +154,23 @@ async def cb_handle_catalog(callback: CallbackQuery, bot: Bot, db_session, state
                     await bot.send_photo(
                         callback.message.chat.id,
                         FSInputFile(cat_image_path),
-                        caption=f"🌸 {category.name}\n\nВыберите букет:",
-                        reply_markup=get_products_keyboard(products, cat_id=cat_id),
+                        caption=cat_text,
+                        reply_markup=products_kb,
                     )
                 except (TelegramForbiddenError, Exception):
                     await callback.message.edit_text(
-                        f"🌸 {category.name}\n\nВыберите букет:",
-                        reply_markup=get_products_keyboard(products, cat_id=cat_id),
+                        cat_text,
+                        reply_markup=products_kb,
                     )
             else:
                 await callback.message.edit_text(
-                    f"🌸 {category.name}\n\nВыберите букет:",
-                    reply_markup=get_products_keyboard(products, cat_id=cat_id),
+                    cat_text,
+                    reply_markup=products_kb,
                 )
         else:
             await callback.message.edit_text(
-                f"🌸 {category.name}\n\nВыберите букет:",
-                reply_markup=get_products_keyboard(products, cat_id=cat_id),
+                cat_text,
+                reply_markup=products_kb,
             )
 
         await callback.answer()
@@ -216,7 +222,8 @@ async def cb_handle_back(callback: CallbackQuery, bot: Bot, db_session, state: F
 
     if prev is None:
         # Стек пуст — в главное меню
-        await callback.message.answer("🌸 Выберите раздел:", reply_markup=get_main_keyboard())
+        main_kb = get_main_keyboard()
+        await callback.message.answer("🌸 Выберите раздел:", reply_markup=main_kb)
         await callback.answer()
         return
 
@@ -228,11 +235,13 @@ async def cb_handle_back(callback: CallbackQuery, bot: Bot, db_session, state: F
     elif prev_screen == SCREEN_CATEGORIES:
         categories = await _get_categories_with_available_products(db_session)
         if categories:
-            await callback.message.edit_text("🌸 Выберите категорию:", reply_markup=get_categories_keyboard(categories))
+            cats_kb = get_categories_keyboard(categories)
+            await callback.message.edit_text("🌸 Выберите категорию:", reply_markup=cats_kb)
         else:
             await callback.message.edit_text("🌸 Каталог пока пуст.")
     else:
-        await callback.message.answer("🌸 Выберите раздел:", reply_markup=get_main_keyboard())
+        main_kb = get_main_keyboard()
+        await callback.message.answer("🌸 Выберите раздел:", reply_markup=main_kb)
 
     await callback.answer()
 
@@ -257,6 +266,16 @@ async def restore_category_products(callback: CallbackQuery, bot: Bot, db_sessio
 
     await state.set_state(NavigationState.set)
     await state.update_data(screen=SCREEN_PRODUCTS, cat_id=cat_id)
+
+    # Save message with keyboard
+    user = callback.from_user
+    async with async_session_factory() as session:
+        user_result = await session.execute(select(User).where(User.telegram_id == user.id))
+        internal_user = user_result.scalar_one_or_none()
+        if internal_user:
+            products_kb = get_products_keyboard(products, cat_id=cat_id)
+            caption = f"🌸 {category.name}\n\nВыберите букет:"
+            await save_outgoing(internal_user.id, caption, products_kb)
 
     await callback.message.delete()
     caption = f"🌸 {category.name}\n\nВыберите букет:"
@@ -304,6 +323,14 @@ async def cb_handle_product(callback: CallbackQuery, bot: Bot, db_session, state
 
         keyboard = get_product_detail_keyboard(product, cat_id=cat_id)
 
+        # Save message with keyboard
+        user = callback.from_user
+        async with async_session_factory() as session:
+            user_result = await session.execute(select(User).where(User.telegram_id == user.id))
+            internal_user = user_result.scalar_one_or_none()
+            if internal_user:
+                await save_outgoing(internal_user.id, text, keyboard)
+
         await push_navigation(state, SCREEN_PRODUCT, cat_id=cat_id, product_id=prod_id)
 
         # Загружаем все фотографии товара
@@ -313,20 +340,11 @@ async def cb_handle_product(callback: CallbackQuery, bot: Bot, db_session, state
                 img_path = get_image_path(img.image_url)
                 if img_path and os.path.exists(img_path):
                     photo = FSInputFile(img_path)
-                    if i == 0:
-                        # Первое фото с caption и reply_markup
-                        media_group.append({
-                            'type': 'photo',
-                            'media': photo,
-                            'caption': text,
-                            'parse_mode': 'HTML',
-                        })
-                    else:
-                        # Последующие фото без caption
-                        media_group.append({
-                            'type': 'photo',
-                            'media': photo,
-                        })
+                    # Все фото без caption, caption отправим отдельным сообщением с кнопками
+                    media_group.append({
+                        'type': 'photo',
+                        'media': photo,
+                    })
 
             if media_group:
                 try:
@@ -334,8 +352,8 @@ async def cb_handle_product(callback: CallbackQuery, bot: Bot, db_session, state
                         callback.message.chat.id,
                         media_group,
                     )
-                    # Отправляем reply_markup отдельным сообщением
-                    await callback.message.answer("🌸 Выберите букет:", reply_markup=keyboard)
+                    # Отправляем описание товара с кнопками "В корзину" и "Назад"
+                    await callback.message.answer(text, reply_markup=keyboard)
                     await callback.answer()
                     return
                 except Exception as e:
@@ -346,7 +364,7 @@ async def cb_handle_product(callback: CallbackQuery, bot: Bot, db_session, state
         try:
             await callback.message.edit_text(text, reply_markup=keyboard)
         except TelegramBadRequest:
-            pass
+            await callback.message.answer(text, reply_markup=keyboard)
 
         await callback.answer()
 

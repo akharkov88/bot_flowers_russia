@@ -24,10 +24,16 @@
             {% if msg.callback_data %}
             <div class="message-callback-data">{{ msg._formatted_callback or msg.callback_data }}</div>
             {% endif %}
+            {% if msg.keyboard %}
+            <div class="message-keyboard" data-keyboard="{{ msg.keyboard }}"></div>
+            {% endif %}
             <div class="message-time">{{ msg._created_at_msk.strftime('%d.%m.%Y %H:%M:%S') if msg._created_at_msk else '' }}</div>
         </div>
         {% endfor %}
     </div>
+
+    <!-- Scroll to bottom button -->
+    <button id="scrollToBottomBtn" class="scroll-to-bottom-btn" style="display: none;" onclick="scrollToBottom()" title="Прокрутить вниз">⬇️ Вниз</button>
 
     <!-- Image preview area -->
     <div id="imagePreviewContainer" class="image-preview-container" style="display: none;">
@@ -156,6 +162,48 @@
     word-break: break-word;
 }
 
+.message-keyboard {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    border: 1px dashed rgba(0,0,0,0.2);
+    backdrop-filter: blur(5px);
+}
+
+.keyboard-label {
+    font-size: 0.7rem;
+    color: #666;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.keyboard-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.keyboard-row:last-child {
+    margin-bottom: 0;
+}
+
+.keyboard-btn {
+    padding: 0.4rem 0.7rem;
+    background: rgba(184, 59, 90, 0.85);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: default;
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    font-weight: 500;
+}
+
 .message-time {
     font-size: 0.7rem;
     margin-top: 0.3rem;
@@ -259,6 +307,31 @@
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(184, 59, 90, 0.12);
 }
+
+.scroll-to-bottom-btn {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.scroll-to-bottom-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
 </style>
 
 <script>
@@ -296,7 +369,36 @@ async function deleteMessage(messageId, btn) {
 function scrollToBottom() {
     const messages = document.getElementById('messages');
     messages.scrollTop = messages.scrollHeight;
+    document.getElementById('scrollToBottomBtn').style.display = 'none';
 }
+
+function renderKeyboard(keyboardData) {
+    if (!keyboardData || !keyboardData.buttons) return '';
+    
+    let html = '<div class="message-keyboard">';
+    html += '<div class="keyboard-label">📱 Клавиатура:</div>';
+    
+    for (const row of keyboardData.buttons) {
+        html += '<div class="keyboard-row">';
+        for (const btn of row) {
+            html += `<div class="keyboard-btn" title="${btn.text}">${btn.text}</div>`;
+        }
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    return html;
+}
+
+// Show/hide scroll button based on scroll position
+function updateScrollButton() {
+    const messages = document.getElementById('messages');
+    const btn = document.getElementById('scrollToBottomBtn');
+    const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 100;
+    btn.style.display = atBottom ? 'none' : 'flex';
+}
+
+document.getElementById('messages').addEventListener('scroll', updateScrollButton);
 
 async function fetchMessages() {
     try {
@@ -320,6 +422,7 @@ async function fetchMessages() {
                 scrollToBottom();
             }
         }
+        updateScrollButton();
     } catch (e) {
         console.error('fetchMessages error:', e);
     }
@@ -344,10 +447,17 @@ function createMessageElement(msg) {
         html += `<div class="message-text">${escapeHtml(msg.text)}</div>`;
     }
 
-    if (msg.formatted_callback) {
-        html += `<div class="message-callback-data">${escapeHtml(msg.formatted_callback)}</div>`;
-    } else if (msg.callback_data) {
-        html += `<div class="message-callback-data">${escapeHtml(msg.callback_data)}</div>`;
+    if (msg.callback_data) {
+        html += `<div class="message-callback-data">${escapeHtml(msg.formatted_callback || msg.callback_data)}</div>`;
+    }
+
+    if (msg.keyboard) {
+        try {
+            const keyboardData = JSON.parse(msg.keyboard);
+            html += renderKeyboard(keyboardData);
+        } catch (e) {
+            console.error('Error parsing keyboard:', e);
+        }
     }
 
     html += `<div class="message-time">${msg.created_at}</div>`;
@@ -362,6 +472,24 @@ function escapeHtml(text) {
 }
 
 setInterval(fetchMessages, 3000);
+
+// Render keyboards from server-side messages on page load
+function renderExistingKeyboards() {
+    document.querySelectorAll('.message-keyboard').forEach(container => {
+        const keyboardJson = container.getAttribute('data-keyboard');
+        if (!keyboardJson) return;
+        
+        try {
+            const keyboardData = JSON.parse(keyboardJson);
+            const keyboardHtml = renderKeyboard(keyboardData);
+            container.outerHTML = keyboardHtml;
+        } catch (e) {
+            console.error('Error parsing keyboard on page load:', e);
+        }
+    });
+}
+
+renderExistingKeyboards();
 
 document.getElementById('messageInput').focus();
 
@@ -496,6 +624,7 @@ async function submitMessage() {
                 if (indicator) indicator.remove();
                 // Force one fetch to get real messages from server
                 fetchMessages();
+                updateScrollButton();
             }, 1500);
         }
     } catch (e) {
@@ -519,5 +648,8 @@ messageInput.addEventListener('keydown', function(e) {
         submitMessage();
     }
 });
+
+// Initial scroll check
+setTimeout(updateScrollButton, 500);
 </script>
 {% endblock %}
