@@ -16,3 +16,7 @@ alembic/versions/*.py
 .vscode/
 *.swp
 *.swo
+
+# Backup
+migrations_backup/
+
