@@ -24,9 +24,9 @@ fi
 
 # Отключить энергосбережение дисплея (X11)
 if command -v xset &>/dev/null && [ -n "$DISPLAY" ]; then
-    xset s off        # отключить экранную заставку
-    xset -dpms        # отключить DPMS (выключение дисплея)
-    xset s noblank    # отключить бланкирование экрана
+    xset s off 2>/dev/null || true        # отключить экранную заставку
+    xset -dpms 2>/dev/null || true        # отключить DPMS (выключение дисплея)
+    xset s noblank 2>/dev/null || true    # отключить бланкирование экрана
 fi
 
 # Отключить автосон в GNOME (только если есть права root для dbus)
@@ -57,16 +57,48 @@ if [ -n "$DISPLAY" ] && command -v xdotool &>/dev/null; then
 fi
 
 # ============================================
-# Очистка старого процесса
+# Функция остановки всех процессов бота и веб-панели
 # ============================================
-PORT=8001
-PID=$(lsof -t -i:$PORT 2>/dev/null)
+kill_all() {
+    echo "Остановка всех процессов бота и веб-панели..."
+    
+    # Убить все процессы бота через порт
+    PORT=8001
+    PID=$(lsof -t -i:$PORT 2>/dev/null)
+    if [ -n "$PID" ]; then
+        echo "Убиваю процесс(ы) на порту $PORT..."
+        kill -9 $PID 2>/dev/null
+    fi
+    
+    # Убить все python процессы с bot.main
+    pkill -9 -f "python -m bot.main" 2>/dev/null
+    
+    # Убить процессы веб-сервера админа
+    pkill -9 -f "run_web.sh" 2>/dev/null
+    
+    # Дополнительная очистка - убить всё на портах
+    for PORT in 8001 8000; do
+        fuser -k 9 $PORT/tcp 2>/dev/null
+    done
+    
+    sleep 2
+    
+    # Проверка - убедиться что процессы убиты
+    REMAINING=$(pgrep -f "python -m bot.main" 2>/dev/null)
+    if [ -n "$REMAINING" ]; then
+        echo "Принудительно убиваю оставшиеся процессы: $REMAINING"
+        kill -9 $REMAINING 2>/dev/null
+        sleep 1
+    fi
+    
+    echo "Все процессы остановлены."
+}
 
-if [ -n "$PID" ]; then
-    echo "Убиваю старый процесс на порту $PORT (PID: $PID)..."
-    kill -9 $PID 2>/dev/null
-    sleep 1
-fi
+# ============================================
+# Очистка старого процесса бота
+# ============================================
+echo "Очистка старых процессов бота..."
+kill_all
 
 # ============================================
 # Запуск бота и веб-панели админа
@@ -99,6 +131,7 @@ cleanup() {
     echo "Остановка..."
     kill $BOT_PID 2>/dev/null
     [ -n "$PREVENT_SLEEP_PID" ] && kill $PREVENT_SLEEP_PID 2>/dev/null
+    kill_all
     exit 0
 }
 trap cleanup SIGINT SIGTERM

@@ -491,13 +491,24 @@ async def main():
 
     scheduled_posts_task = asyncio.create_task(process_scheduled_posts())
 
+    # Don't let admin panel failure kill the bot
+    async def safe_admin_task():
+        try:
+            await admin_task
+        except asyncio.CancelledError:
+            pass
+        except (SystemExit, Exception) as e:
+            logger.error(f"Admin panel crashed: {e}. Bot continues running.")
+
+    admin_guard = asyncio.create_task(safe_admin_task())
+
     try:
         logger.info("Bot starting polling...")
         await dp.start_polling(bot)
     finally:
-        admin_task.cancel()
+        admin_guard.cancel()
         try:
-            await admin_task
+            await admin_guard
         except asyncio.CancelledError:
             pass
         notifications_task.cancel()

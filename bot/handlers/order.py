@@ -222,7 +222,8 @@ async def process_date(message: Message, state: FSMContext, db_session, user):
             year = int(parts[2]) if len(parts) == 3 else None
             if year and year < 100:
                 year += 2000
-            validated_date = date(year or 2000, month, day)  # dummy year for validation
+            current_year = date.today().year
+            validated_date = date(year or current_year, month, day)  # use current year as fallback
         except ValueError:
             text = "⚠️ Такая дата не существует. Проверьте день и месяц."
             await message.answer(text)

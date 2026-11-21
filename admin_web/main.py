@@ -1,8 +1,11 @@
 import asyncio
 import os
 import uvicorn
+import logging
 
 from fastapi import FastAPI, Request, Form, HTTPException, Response
+
+logger = logging.getLogger("bot_russia_flowers")
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -110,6 +113,17 @@ async def dashboard(request: Request):
 
 async def run_admin_web():
     """Run the admin web panel with uvicorn"""
+    import socket
+    
+    # Check if port is already in use
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    result = sock.connect_ex(('127.0.0.1', settings.web_admin_port))
+    sock.close()
+    
+    if result == 0:
+        logger = __import__('bot.utils.logger', fromlist=['logger']).logger
+        logger.warning(f"Port {settings.web_admin_port} is already in use. Admin panel may fail to start.")
+    
     config = uvicorn.Config(
         app,
         host=settings.web_admin_host,
@@ -117,4 +131,10 @@ async def run_admin_web():
         log_level="info",
     )
     server = uvicorn.Server(config)
-    await server.serve()
+    
+    try:
+        await server.serve()
+    except (SystemExit, OSError) as e:
+        # Don't crash the whole bot if admin panel fails
+        logger = __import__('bot.utils.logger', fromlist=['logger']).logger
+        logger.error(f"Admin panel failed to start: {e}. Bot will continue running without web panel.")

@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import date
+from datetime import date, time
 
 from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery
@@ -254,7 +254,8 @@ async def process_delivery_date(message: Message, state: FSMContext, db_session,
             year = int(parts[2]) if len(parts) == 3 else None
             if year and year < 100:
                 year += 2000
-            delivery_date = date(year or 2000, month, day)  # dummy year for DB
+            current_year = date.today().year
+            delivery_date = date(year or current_year, month, day)  # use current year as fallback
             delivery_date_str = date_str
         except ValueError:
             text = "⚠️ Такая дата не существует. Проверьте день и месяц."
@@ -588,12 +589,23 @@ async def process_comment(message: Message, state: FSMContext, db_session, user,
     else:
         full_comment = ""
 
+    # Parse delivery time
+    delivery_time = None
+    if time_str:
+        try:
+            if ":" in time_str:
+                hour, minute = map(int, time_str.split(":"))
+                delivery_time = time(hour, minute)
+        except (ValueError, IndexError):
+            pass
+
     order = Order(
         user_id=user_id,
         status="new",
         total_price=0.0,
         delivery_address=address,
         delivery_date=delivery_date,
+        delivery_time=delivery_time,
         phone=phone,
         comment=full_comment,
         is_custom=True,

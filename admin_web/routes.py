@@ -150,6 +150,7 @@ async def update_order_details(
     delivery_time: str = Form(""),
     phone: str = Form(""),
     comment: str = Form(""),
+    total_price: str = Form(""),
 ):
     async with async_session_factory() as session:
         result = await session.execute(select(Order).where(Order.id == order_id))
@@ -168,10 +169,11 @@ async def update_order_details(
             order.delivery_address = new_val
 
         if delivery_date is not None:
-            old_val = str(order.delivery_date) if order.delivery_date else "не указана"
+            old_formatted = order.delivery_date.strftime("%d.%m.%Y") if order.delivery_date else "не указана"
             new_val = delivery_date.strip() if delivery_date.strip() else None
-            if old_val != (new_val or "не указана"):
-                changes.append(f"Дата: {old_val} → {new_val or 'не указана'}")
+            new_formatted = new_val if new_val else "не указана"
+            if old_formatted != new_formatted:
+                changes.append(f"Дата: {old_formatted} → {new_formatted}")
             if new_val:
                 try:
                     parts = new_val.split(".")
@@ -185,10 +187,11 @@ async def update_order_details(
                 order.delivery_date = None
 
         if delivery_time is not None:
-            old_val = str(order.delivery_time) if order.delivery_time else "не указано"
+            old_formatted = order.delivery_time.strftime("%H:%M") if order.delivery_time else "не указано"
             new_val = delivery_time.strip() if delivery_time.strip() else None
-            if old_val != (new_val or "не указано"):
-                changes.append(f"Время: {old_val} → {new_val or 'не указано'}")
+            new_formatted = new_val if new_val else "не указано"
+            if old_formatted != new_formatted:
+                changes.append(f"Время: {old_formatted} → {new_formatted}")
             if new_val:
                 try:
                     if ":" in new_val:
@@ -214,6 +217,25 @@ async def update_order_details(
             if old_val != (new_val or "не указан"):
                 changes.append(f"Комментарий: {old_val} → {new_val or 'не указан'}")
             order.comment = new_val
+
+        # Update total price for custom orders
+        if order.is_custom:
+            try:
+                raw_price = total_price if total_price else ""
+                raw_price = str(raw_price).strip()
+                if raw_price:
+                    new_price = float(raw_price)
+                    old_price = order.total_price or 0.0
+                    if abs(old_price - new_price) > 0.01:
+                        changes.append(f"Сумма: {old_price:.0f} ₽ → {new_price:.0f} ₽")
+                        logger.info(f"Order {order_id}: total_price changed from {old_price} to {new_price}")
+                    order.total_price = new_price
+                else:
+                    if (order.total_price or 0.0) > 0:
+                        changes.append(f"Сумма: {(order.total_price or 0.0):.0f} ₽ → 0 ₽")
+                    order.total_price = 0.0
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Order {order_id}: invalid total_price value: {total_price!r}, error: {e}")
 
         await session.commit()
 

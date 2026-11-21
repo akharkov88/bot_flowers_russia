@@ -132,6 +132,9 @@ class TrackingMiddleware(BaseMiddleware):
                             await event.answer("⛔ Вы заблокированы в боте. Обратитесь к администратору.")
                         return
 
+                # Cache display name before any commit/rollback to avoid lazy-load issues
+                user_name_display = user.first_name or user.username or str(tg.id)
+
                 data["user"] = user
                 data["db_session"] = session
 
@@ -152,7 +155,6 @@ class TrackingMiddleware(BaseMiddleware):
                         await session.rollback()
 
                     # Send desktop push notification (non-blocking)
-                    user_name_display = user.first_name or user.username or str(tg.id)
                     asyncio.create_task(
                         send_desktop_notification(
                             f"📩 {user_name_display} (ID:{user.id} | TG:{tg.id})",

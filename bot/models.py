@@ -120,7 +120,7 @@ class Cart(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    telegram_id = Column(Integer, nullable=False)
+    telegram_id = Column(BigInteger, nullable=False)
     data = Column(Text, nullable=False)  # JSON: {"product_id": quantity}
     total_price = Column(Float, default=0.0)
     status = Column(String(20), default="active")  # active | completed | abandoned
@@ -179,7 +179,7 @@ class PostRecipient(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    telegram_id = Column(Integer, nullable=False)
+    telegram_id = Column(BigInteger, nullable=False)
     status = Column(String(20), default="pending")  # pending | sent | failed
     sent_at = Column(DateTime, nullable=True)
     error_message = Column(Text, nullable=True)
