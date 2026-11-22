@@ -71,6 +71,15 @@
 </div>
 
 <script>
+// Initialize with existing image URLs from the server
+let existingImages = [
+    {% if product and product.images %}
+    {% for img in product.images %}
+    "{{ img.image_url }}",
+    {% endfor %}
+    {% endif %}
+];
+
 async function deleteImage(productId, imageId) {
     if (!confirm('Удалить изображение?')) return;
     try {
@@ -118,7 +127,14 @@ document.getElementById('image').addEventListener('change', async function(e) {
                 const data = await response.json();
                 const imageUrl = data.image_url || data;
                 if (typeof imageUrl === 'string') {
+                    // Check for duplicates in both existing and pending images
+                    if (data.exists || existingImages.includes(imageUrl) || pendingImages.includes(imageUrl)) {
+                        console.log('Image already exists, skipping:', imageUrl);
+                        alert('Это изображение уже добавлено для данного товара.');
+                        return;
+                    }
                     pendingImages.push(imageUrl);
+                    existingImages.push(imageUrl);
                     const preview = document.getElementById('imagePreview');
                     const div = document.createElement('div');
                     div.style.cssText = 'position: relative;';
@@ -143,7 +159,15 @@ document.getElementById('image').addEventListener('change', async function(e) {
 
 function deletePendingImage(idx) {
     if (!confirm('Удалить фото?')) return;
+    const removedUrl = pendingImages[idx];
     pendingImages.splice(idx, 1);
+    // Also remove from existingImages
+    if (removedUrl) {
+        const existingIdx = existingImages.indexOf(removedUrl);
+        if (existingIdx !== -1) {
+            existingImages.splice(existingIdx, 1);
+        }
+    }
     if (pendingElements[idx]) {
         pendingElements[idx].remove();
         pendingElements.splice(idx, 1);

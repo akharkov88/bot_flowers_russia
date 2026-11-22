@@ -348,6 +348,17 @@ async def add_product_image(product_id: int, request: Request, image: UploadFile
     image_url = f"/static/uploads/{filename}"
     
     async with async_session_factory() as session:
+        # Check if this image URL already exists for this product
+        existing = await session.execute(
+            select(ProductImage).where(
+                ProductImage.product_id == product_id,
+                ProductImage.image_url == image_url
+            )
+        )
+        if existing.scalar_one_or_none():
+            # Image already exists, return URL without creating duplicate
+            return JSONResponse(content={"image_url": image_url, "exists": True})
+        
         # Get max order
         result = await session.execute(
             select(func.coalesce(func.max(ProductImage.order), 0)).where(ProductImage.product_id == product_id)
@@ -362,7 +373,7 @@ async def add_product_image(product_id: int, request: Request, image: UploadFile
         session.add(product_image)
         await session.commit()
     
-    return JSONResponse(content={"image_url": image_url})
+    return JSONResponse(content={"image_url": image_url, "exists": False})
 
 
 @router.post("/products/{product_id}/delete-image/{image_id}")
@@ -479,15 +490,23 @@ async def product_edit_submit(
         if image_url:
             product.image_url = image_url
 
-        # Save additional images from pendingImages
+        # Save additional images from pendingImages (only new ones)
         if images:
             image_list = json.loads(images)
+            
+            # Get existing image URLs for this product
+            result = await session.execute(select(ProductImage).where(ProductImage.product_id == product_id))
+            existing_images = result.scalars().all()
+            existing_urls = {img.image_url for img in existing_images}
+            
+            # Only add images that don't already exist
             for order, img_url in enumerate(image_list):
-                session.add(ProductImage(
-                    product_id=product_id,
-                    image_url=img_url,
-                    order=order,
-                ))
+                if img_url not in existing_urls:
+                    session.add(ProductImage(
+                        product_id=product_id,
+                        image_url=img_url,
+                        order=order,
+                    ))
 
         await session.commit()
     response = RedirectResponse(url="/products", status_code=302)

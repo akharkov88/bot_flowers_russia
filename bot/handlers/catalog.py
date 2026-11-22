@@ -336,7 +336,13 @@ async def cb_handle_product(callback: CallbackQuery, bot: Bot, db_session, state
         # Загружаем все фотографии товара
         if product.images:
             media_group = []
+            seen_urls = set()
             for i, img in enumerate(product.images):
+                # Skip duplicates
+                if img.image_url in seen_urls:
+                    continue
+                seen_urls.add(img.image_url)
+                
                 img_path = get_image_path(img.image_url)
                 if img_path and os.path.exists(img_path):
                     photo = FSInputFile(img_path)
@@ -345,9 +351,13 @@ async def cb_handle_product(callback: CallbackQuery, bot: Bot, db_session, state
                         'type': 'photo',
                         'media': photo,
                     })
+                    logger.info(f"Added product photo: {img_path}")
+                else:
+                    logger.warning(f"Photo file not found: {img_path} for URL: {img.image_url}")
 
             if media_group:
                 try:
+                    logger.info(f"Sending {len(media_group)} photos for product {product.name}")
                     await bot.send_media_group(
                         callback.message.chat.id,
                         media_group,
@@ -359,6 +369,8 @@ async def cb_handle_product(callback: CallbackQuery, bot: Bot, db_session, state
                 except Exception as e:
                     logger.error(f"send_media_group error: {e}")
                     pass
+            else:
+                logger.warning(f"No valid photos found for product {product.name}")
 
         # Если нет фото или ошибка - отправляем текстовое сообщение
         try:
