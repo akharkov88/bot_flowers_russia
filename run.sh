@@ -6,9 +6,12 @@
 
 # Отключить сон системы (только если есть права root)
 if [ "$(id -u)" -eq 0 ]; then
-    # systemd-based systems
+    # systemd-based systems — блокируем сон на уровне системы
     if command -v systemctl &>/dev/null; then
         systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target 2>/dev/null
+        # Блокируем idle-sleep даже при заблокированном экране
+        systemctl set-property systemd-logind.idle-action none 2>/dev/null
+        systemctl set-property systemd-logind.IdleAction ignore 2>/dev/null
     fi
 
     # laptop-mode-tools
@@ -43,18 +46,31 @@ prevent_sleep() {
     while true; do
         # Отправляем «нажатие» на пустой файл (предотвращает idle sleep)
         if command -v xdotool &>/dev/null && [ -n "$DISPLAY" ]; then
-            xdotool key alt+F4 2>/dev/null &  # имитация активности раз в 5 минут
+            # Двигаем мышь на 1 пиксель и возвращаем обратно (невидимо для пользователя)
+            xdotool mousemove_relative 1 0 2>/dev/null
+            sleep 1
+            xdotool mousemove_relative -1 0 2>/dev/null
         fi
-        sleep 300  # каждые 5 минут
+        # Дополнительная активность: создаём/обновляем временный файл
+        touch /tmp/bot_activity_marker 2>/dev/null
+        sleep 60  # каждые 60 секунд
     done
 }
 
-# Запуск prevent_sleep в фоне (только если есть DISPLAY)
-if [ -n "$DISPLAY" ] && command -v xdotool &>/dev/null; then
-    prevent_sleep &
-    PREVENT_SLEEP_PID=$!
-    echo "⏰ Предотвращение сна активно (PID: $PREVENT_SLEEP_PID)"
+# ============================================
+# Блокировка сна через systemd-inhibit (работает от обычного пользователя)
+# ============================================
+if command -v systemd-inhibit &>/dev/null; then
+    systemd-inhibit --what=sleep:idle --why="Bot running - prevent sleep" --mode=block \
+        bash -c 'while true; do sleep 3600; done' &
+    INHIBIT_PID=$!
+    echo "🔒 systemd-inhibit активен (PID: $INHIBIT_PID) — сон заблокирован"
 fi
+
+# Запуск prevent_sleep в фоне
+prevent_sleep &
+PREVENT_SLEEP_PID=$!
+echo "⏰ Предотвращение сна активно (PID: $PREVENT_SLEEP_PID)"
 
 # ============================================
 # Функция остановки всех процессов бота и веб-панели
@@ -209,6 +225,7 @@ cleanup() {
     echo "Остановка..."
     kill $BOT_PID 2>/dev/null
     [ -n "$PREVENT_SLEEP_PID" ] && kill $PREVENT_SLEEP_PID 2>/dev/null
+    [ -n "$INHIBIT_PID" ] && kill $INHIBIT_PID 2>/dev/null
     [ -n "$NGROK_PID" ] && kill $NGROK_PID 2>/dev/null
     kill_all
     exit 0
