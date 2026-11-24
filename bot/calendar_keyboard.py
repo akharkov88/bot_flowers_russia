@@ -1,11 +1,16 @@
 """Inline calendar keyboard for date and time selection in Telegram bot."""
 
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta, datetime, time as dt_time
 from math import ceil
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.keyboards import pack_cb
+
+# Delivery constraints
+_LATEST_ORDER_HOUR = 20  # Latest hour for placing orders (20:00)
+_MIN_PREPARE_HOURS = 2   # Minimum preparation hours before delivery
+_MORNING_START_HOUR = 11 # Earliest delivery time next day after cutoff
 
 # Day names (Monday first — Russian convention)
 _DAY_NAMES = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
@@ -16,7 +21,80 @@ _MONTH_NAMES = [
     "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь",
 ]
 
-# Default time slots (every 30 min, 24/7)
+
+def get_available_dates(min_date: date = None, max_date: date = None) -> tuple:
+    """Calculate available date range based on current time.
+    
+    If current time >= 20:00, today is unavailable and min_date becomes tomorrow.
+    
+    Returns:
+        Tuple of (effective_min_date, today_blocked, morning_start_time)
+        - effective_min_date: the earliest selectable date
+        - today_blocked: True if today is blocked (after 20:00)
+        - morning_start_time: earliest time slot for the next available day after cutoff
+    """
+    now = datetime.now()
+    today = now.date()
+    
+    if min_date is None:
+        min_date = today
+    
+    today_blocked = now.hour >= _LATEST_ORDER_HOUR
+    
+    if today_blocked:
+        effective_min_date = today + timedelta(days=1)
+    else:
+        effective_min_date = min_date
+    
+    morning_start_time = dt_time(_MORNING_START_HOUR, 0)
+    
+    return effective_min_date, today_blocked, morning_start_time
+
+
+def get_available_time_slots(selected_date: date = None, available_slots: list = None, prefix: str = "") -> list:
+    """Get time slots filtered by selected date and current time.
+    
+    Rules:
+    - If selected_date is today: slots must be >= current_time + 2 hours
+    - If selected_date is after cutoff day: slots start from 11:00
+    
+    Args:
+        selected_date: The date selected by the user
+        available_slots: List of available time slots (default: 09:00-23:30)
+        prefix: Prefix for callback data
+        
+    Returns:
+        Filtered list of available time slot callback buttons
+    """
+    if available_slots is None:
+        available_slots = _DEFAULT_TIME_SLOTS
+    
+    now = datetime.now()
+    today = now.date()
+    after_cutoff = now.hour >= _LATEST_ORDER_HOUR
+
+    filtered_slots = []
+
+    for slot in available_slots:
+        slot_hour, slot_minute = map(int, slot.split(":"))
+        slot_time = dt_time(slot_hour, slot_minute)
+
+        if selected_date == today:
+            # Today: must be at least 2 hours from now
+            min_datetime = now + timedelta(hours=_MIN_PREPARE_HOURS)
+            min_time = dt_time(min_datetime.hour, min_datetime.minute)
+            if slot_time < min_time:
+                continue
+        elif after_cutoff and selected_date == today + timedelta(days=1):
+            # After 20:00 cutoff: next day starts from morning
+            if slot_time < dt_time(_MORNING_START_HOUR, 0):
+                continue
+
+        filtered_slots.append(slot)
+    
+    return filtered_slots
+
+
 def _generate_time_slots():
     """Generate 30-minute slots for a full 24-hour day (00:00–23:30)."""
     slots = []
@@ -32,18 +110,28 @@ def get_time_keyboard(
     selected_time: str = None,
     available_slots: list = None,
     prefix: str = "",
+    selected_date: date = None,
 ) -> InlineKeyboardMarkup:
     """Generate an inline keyboard with time slot buttons.
 
     Args:
         selected_time: Currently selected time (if any)
-        available_slots: List of available time slots (default: 09:00-21:00)
+        available_slots: List of available time slots (default: 00:00-23:30)
         prefix: Prefix for callback data type to avoid router conflicts
+        selected_date: Selected delivery date for filtering available slots
 
     Returns:
         InlineKeyboardMarkup with time buttons
     """
-    if available_slots is None:
+    # Filter slots based on selected date
+    if selected_date:
+        available_slots = get_available_time_slots(
+            selected_date=selected_date, 
+            available_slots=available_slots,
+            prefix=prefix
+        )
+    
+    if available_slots is None or not available_slots:
         available_slots = _DEFAULT_TIME_SLOTS
 
     keyboard = []
@@ -104,6 +192,11 @@ def get_calendar_keyboard(
         # Allow selecting up to 3 months ahead
         max_dt = datetime(year, month, 1) + timedelta(days=90)
         max_date = max_dt.date()
+
+    # Apply cutoff rule: if after 20:00, today is not available
+    effective_min_date, today_blocked, _ = get_available_dates(min_date, max_date)
+    if today_blocked:
+        min_date = effective_min_date
 
     keyboard = []
 

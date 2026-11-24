@@ -270,20 +270,21 @@ async def process_delivery_date(message: Message, state: FSMContext, db_session,
             await _save_outgoing(user.id, text)
             return
 
-    await state.update_data(delivery_date=delivery_date, delivery_date_str=delivery_date_str)
+    await state.update_data(delivery_date=delivery_date, delivery_date_str=delivery_date_str, delivery_date_obj=delivery_date)
     await state.set_state(CustomBouquetForm.waiting_for_time)
     # Confirm selected date and show time selection in one message
     if delivery_date_str:
         text = f"✅ Вы выбрали дату: {delivery_date_str}\n\n🕐 Выберите время доставки:\n\nНажмите на удобное время."
+        time_kb = get_time_keyboard(selected_date=delivery_date, prefix="custom_")
     else:
         text = "🕐 Выберите время доставки:\n\nНажмите на удобное время."
-    time_kb = get_time_keyboard(prefix="custom_")
+        time_kb = get_time_keyboard(prefix="custom_")
     await message.answer(text, reply_markup=time_kb)
     await _save_outgoing(user.id, text)
 
 
 @custom_bouquet_router.callback_query(lambda c: c.data and '"t":"custom_cal"' in c.data)
-async def cb_custom_calendar(callback: CallbackQuery, state: FSMContext, db_session):
+async def cb_custom_calendar(callback: CallbackQuery, state: FSMContext, db_session, user):
     # Only handle if user is in custom bouquet flow
     current_state = await state.get_state()
     if current_state != CustomBouquetForm.waiting_for_delivery_date.state:
@@ -305,7 +306,7 @@ async def cb_custom_calendar(callback: CallbackQuery, state: FSMContext, db_sess
             d = data.get("d", 1)
             selected_date = date(cal_year, cal_month, d)
             delivery_date_str = format_date_display(selected_date)
-            await state.update_data(delivery_date=selected_date, delivery_date_str=delivery_date_str, cal_year=cal_year, cal_month=cal_month)
+            await state.update_data(delivery_date=selected_date, delivery_date_str=delivery_date_str, delivery_date_obj=selected_date, cal_year=cal_year, cal_month=cal_month)
 
             # Transition to time selection state
             await state.set_state(CustomBouquetForm.waiting_for_time)
@@ -314,9 +315,9 @@ async def cb_custom_calendar(callback: CallbackQuery, state: FSMContext, db_sess
             await callback.message.delete()
 
             text = f"✅ Выбрана дата: {delivery_date_str}\n\n🕐 Выберите время доставки:"
-            time_kb = get_time_keyboard(prefix="custom_")
+            time_kb = get_time_keyboard(selected_date=selected_date, prefix="custom_")
             await callback.message.answer(text, reply_markup=time_kb)
-            await _save_outgoing(user.id, text, time_kb)
+            await _save_outgoing(callback.from_user.id, text, time_kb)
 
         elif action == "skip":
             await state.update_data(delivery_date=None, delivery_date_str=None)
@@ -325,7 +326,7 @@ async def cb_custom_calendar(callback: CallbackQuery, state: FSMContext, db_sess
             text = "🕐 Выберите время доставки:"
             time_kb = get_time_keyboard(prefix="custom_")
             await callback.message.answer(text, reply_markup=time_kb)
-            await _save_outgoing(user.id, text, time_kb)
+            await _save_outgoing(callback.from_user.id, text, time_kb)
 
         else:
             # prev_month or next_month
@@ -380,8 +381,11 @@ async def process_time(message: Message, state: FSMContext, db_session, user):
         # Validate time format ЧЧ:ММ
         if not re.match(r"^\d{2}:\d{2}$", time_str):
             await state.update_data(_time_sent=False)
+            fsm_data = await state.get_data()
+            selected_date = fsm_data.get("delivery_date_obj")
+            time_kb = get_time_keyboard(selected_date=selected_date, prefix="custom_")
             text = "⚠️ Неверный формат времени.\n\nФормат: ЧЧ:ММ, например: 14:00"
-            await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+            await message.answer(text, reply_markup=time_kb)
             await _save_outgoing(user.id, text)
             return
         try:
@@ -390,8 +394,11 @@ async def process_time(message: Message, state: FSMContext, db_session, user):
                 raise ValueError
         except ValueError:
             await state.update_data(_time_sent=False)
+            fsm_data = await state.get_data()
+            selected_date = fsm_data.get("delivery_date_obj")
+            time_kb = get_time_keyboard(selected_date=selected_date, prefix="custom_")
             text = "⚠️ Такое время не существует. Проверьте часы и минуты."
-            await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+            await message.answer(text, reply_markup=time_kb)
             await _save_outgoing(user.id, text)
             return
 

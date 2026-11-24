@@ -312,6 +312,7 @@ async def cb_calendar(callback: CallbackQuery, state: FSMContext, db_session, us
         delivery_date_str = format_date_display(selected_date)
         await state.update_data(
             date=delivery_date_str,
+            delivery_date_obj=selected_date,
             cal_year=cal_year,
             cal_month=cal_month
         )
@@ -322,7 +323,7 @@ async def cb_calendar(callback: CallbackQuery, state: FSMContext, db_session, us
         # Delete the old calendar message and show time keyboard
         await callback.message.delete()
 
-        time_kb = get_time_keyboard()
+        time_kb = get_time_keyboard(selected_date=selected_date)
         text = f"✅ Вы выбрали дату: {delivery_date_str}\n\n🕐 Выберите время доставки:"
         await callback.message.answer(text, reply_markup=time_kb)
         await _save_outgoing(user.id, text, time_kb)
@@ -431,11 +432,11 @@ async def process_date(message: Message, state: FSMContext, db_session, user):
             await _save_outgoing(user.id, text)
             return
 
-        await state.update_data(date=date_str)
+        await state.update_data(date=date_str, delivery_date_obj=validated_date)
         await state.set_state(OrderForm.waiting_for_time)
         # Confirm selected date and show time selection in one message
         text = f"✅ Вы выбрали дату: {date_str}\n\n🕐 Выберите время доставки:\n\nНажмите на удобное время."
-        time_kb = get_time_keyboard()
+        time_kb = get_time_keyboard(selected_date=validated_date)
         await message.answer(text, reply_markup=time_kb)
         await _save_outgoing(user.id, text, time_kb)
     except Exception as e:
@@ -543,7 +544,9 @@ async def process_time(message: Message, state: FSMContext, db_session, user):
         elif time_str:
             if not re.match(r"^\d{2}:\d{2}$", time_str):
                 await state.update_data(_time_sent=False)
-                time_kb = get_time_keyboard()
+                fsm_data = await state.get_data()
+                selected_date = fsm_data.get("delivery_date_obj")
+                time_kb = get_time_keyboard(selected_date=selected_date)
                 text = "⚠️ Неверный формат времени.\n\nФормат: ЧЧ:ММ, например: 14:00"
                 await message.answer(text, reply_markup=time_kb)
                 await _save_outgoing(user.id, text)
@@ -554,7 +557,9 @@ async def process_time(message: Message, state: FSMContext, db_session, user):
                     raise ValueError
             except ValueError:
                 await state.update_data(_time_sent=False)
-                time_kb = get_time_keyboard()
+                fsm_data = await state.get_data()
+                selected_date = fsm_data.get("delivery_date_obj")
+                time_kb = get_time_keyboard(selected_date=selected_date)
                 text = "⚠️ Такое время не существует. Проверьте часы и минуты."
                 await message.answer(text, reply_markup=time_kb)
                 await _save_outgoing(user.id, text)
@@ -582,6 +587,8 @@ async def process_time(message: Message, state: FSMContext, db_session, user):
             text = "📞 Введите номер телефона для связи:\n\nНапример: +7 (996) 041-22-27"
             await message.answer(text)
             await _save_outgoing(user.id, text)
+
+        return
     except Exception as e:
         logger.error(f"Error in process_time: {e}", exc_info=True)
         await message.answer("❌ Произошла ошибка. Попробуйте ещё раз или начните заново с /start")
