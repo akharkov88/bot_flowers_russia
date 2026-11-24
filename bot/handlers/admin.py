@@ -373,6 +373,16 @@ async def notify_order_chat(bot: Bot, order: Order, is_custom: bool = False):
             if order.comment:
                 text += f"\n💬 {order.comment}"
 
+            # Lead time info
+            from datetime import date as dt_date, timedelta as td
+            max_lead = 0
+            for item in items:
+                if item.product and item.product.min_delivery_days:
+                    max_lead = max(max_lead, item.product.min_delivery_days)
+            if max_lead > 0:
+                min_date = dt_date.today() + td(days=max_lead)
+                text += f"\n⏰ Лид-тайм: {max_lead} дн. (ранее {min_date.strftime('%d.%m.%Y')} нельзя)"
+
         # Отправка в чат
         try:
             await bot.send_message(settings.order_chat_id, text)

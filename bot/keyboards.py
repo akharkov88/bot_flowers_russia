@@ -10,7 +10,7 @@ def pack_cb(**kwargs) -> str:
     # Map short keys to long keys
     SHORT_KEYS = {'t': 'type', 'a': 'action', 'id': 'id', 'p': 'page', 'q': 'qty',
                   'pid': 'product_id', 'cid': 'cat_id', 's': 'screen', 'bt': 'back_to',
-                  'bc': 'back_context'}
+                  'bc': 'back_context', 'tm': 'time'}
     short = {}
     for k, v in kwargs.items():
         if k in SHORT_KEYS:
@@ -20,7 +20,7 @@ def pack_cb(**kwargs) -> str:
     # Use very short keys manually
     short_map = {'type': 't', 'action': 'a', 'id': 'id', 'page': 'p', 'qty': 'q',
                  'product_id': 'pid', 'cat_id': 'cid', 'screen': 's', 'back_to': 'bt',
-                 'back_context': 'bc'}
+                 'back_context': 'bc', 'time': 'tm'}
     compact = {}
     for k, v in short.items():
         compact[short_map.get(k, k)] = v
@@ -33,7 +33,7 @@ def unpack_cb(data: str) -> dict:
     # Map short keys to long keys for compatibility
     LONG_KEYS = {'t': 'type', 'a': 'action', 'p': 'page', 'q': 'qty',
                  'pid': 'product_id', 'cid': 'cat_id', 's': 'screen', 'bt': 'back_to',
-                 'bc': 'back_context'}
+                 'bc': 'back_context', 'tm': 'time'}
     for short, long_key in LONG_KEYS.items():
         if short in result and long_key not in result:
             result[long_key] = result.pop(short)

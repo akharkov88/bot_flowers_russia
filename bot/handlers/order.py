@@ -1,12 +1,13 @@
 import re
-from datetime import date, time
+from datetime import date, time, timedelta
 from typing import List
 
 from aiogram import Router, F, Bot
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 from sqlalchemy import select
 
+from bot.calendar_keyboard import get_calendar_keyboard, format_date_display, get_time_keyboard
 from bot.handlers.admin import notify_order_chat
 from bot.keyboards import get_main_keyboard, get_address_history_keyboard, get_phone_history_keyboard, unpack_cb, _short_hash
 from bot.models import Order, OrderItem, Product, User, Cart
@@ -23,6 +24,20 @@ _MENU_BUTTONS = {
     "✨ Хочу букет которого нет в каталоге",
     "📍 Контакты",
 }
+
+
+async def get_max_lead_days(db_session, cart: dict) -> int:
+    """Возвращает максимальный min_delivery_days среди товаров в корзине."""
+    if not cart:
+        return 0
+    max_days = 0
+    for prod_id_str in cart:
+        pid = int(prod_id_str)
+        result = await db_session.execute(select(Product).where(Product.id == pid))
+        product = result.scalar_one_or_none()
+        if product and product.min_delivery_days and product.min_delivery_days > max_days:
+            max_days = product.min_delivery_days
+    return max_days
 
 
 async def _save_outgoing(user_id, text, keyboard=None):
@@ -116,18 +131,7 @@ async def process_address(message: Message, state: FSMContext, db_session, user)
         # Check if user chose to enter new address
         data = await state.get_data()
 
-        # If checkout already sent the prompt (_address_sent=True), this is the user's address
-        if data.get("_address_sent") and not data.get("chose_new_address"):
-            await state.update_data(
-                address=message.text,
-                _address_sent=False
-            )
-            await state.set_state(OrderForm.waiting_for_date)
-            text = "📅 Введите дату доставки (необязательно):\n\nФормат: ДД.ММ.ГГГГ, ДД.ММ.ГГ или ДД.ММ, например: 15.11.2026, 15.11.26, 15.11"
-            await message.answer(text)
-            await _save_outgoing(user.id, text)
-            return
-
+        # If user chose to enter new address via callback ("Другой адрес"), process their text input
         if data.get("chose_new_address"):
             await state.update_data(
                 address=message.text,
@@ -135,12 +139,74 @@ async def process_address(message: Message, state: FSMContext, db_session, user)
                 _address_sent=False
             )
             await state.set_state(OrderForm.waiting_for_date)
-            text = "📅 Введите дату доставки (необязательно):\n\nФормат: ДД.ММ.ГГГГ, ДД.ММ.ГГ или ДД.ММ, например: 15.11.2026, 15.11.26, 15.11"
-            await message.answer(text)
-            await _save_outgoing(user.id, text)
+            # Confirm selected address
+            confirm_text = f"📍 Вы выбрали адрес доставки: {message.text}"
+            await message.answer(confirm_text)
+            await _save_outgoing(user.id, confirm_text)
+            # Compute min_date from cart lead times
+            cart = data.get("cart", {})
+            max_lead_days = await get_max_lead_days(db_session, cart)
+            min_date = date.today() + timedelta(days=max_lead_days)
+            today = date.today()
+            await state.update_data(cal_year=today.year, cal_month=today.month, min_delivery_days=max_lead_days)
+            cal_kb = get_calendar_keyboard(year=today.year, month=today.month, min_date=min_date)
+            info_msg = ""
+            if max_lead_days > 0:
+                lead_products = []
+                for prod_id_str, qty in cart.items():
+                    pid = int(prod_id_str)
+                    result = await db_session.execute(select(Product).where(Product.id == pid))
+                    p = result.scalar_one_or_none()
+                    if p and p.min_delivery_days and p.min_delivery_days >= max_lead_days:
+                        lead_products.append(f"«{p.name}» ({p.min_delivery_days} дн.)")
+                if lead_products:
+                    info_msg = f"⏰ Товары {', '.join(lead_products)} требуют доставки не ранее чем через {max_lead_days} дн.\n\n"
+            text = info_msg + "📅 Укажите желаемую дату доставки (необязательно).\n\nВыберите дату на календаре."
+            await message.answer(text, reply_markup=cal_kb)
+            await _save_outgoing(user.id, text, cal_kb)
+            return
+
+        # If checkout already sent the prompt (_address_sent=True), this is the user's address
+        if data.get("_address_sent") and not data.get("chose_new_address"):
+            await state.update_data(
+                address=message.text,
+                _address_sent=False
+            )
+            await state.set_state(OrderForm.waiting_for_date)
+            # Confirm selected address
+            confirm_text = f"📍 Вы выбрали адрес доставки: {message.text}"
+            await message.answer(confirm_text)
+            await _save_outgoing(user.id, confirm_text)
+            # Compute min_date from cart lead times
+            cart = data.get("cart", {})
+            max_lead_days = await get_max_lead_days(db_session, cart)
+            min_date = date.today() + timedelta(days=max_lead_days)
+            today = date.today()
+            await state.update_data(cal_year=today.year, cal_month=today.month, min_delivery_days=max_lead_days)
+            cal_kb = get_calendar_keyboard(year=today.year, month=today.month, min_date=min_date)
+            info_msg = ""
+            if max_lead_days > 0:
+                lead_products = []
+                for prod_id_str, qty in cart.items():
+                    pid = int(prod_id_str)
+                    result = await db_session.execute(select(Product).where(Product.id == pid))
+                    p = result.scalar_one_or_none()
+                    if p and p.min_delivery_days and p.min_delivery_days >= max_lead_days:
+                        lead_products.append(f"«{p.name}» ({p.min_delivery_days} дн.)")
+                if lead_products:
+                    info_msg = f"⏰ Товары {', '.join(lead_products)} требуют доставки не ранее чем через {max_lead_days} дн.\n\n"
+            text = info_msg + "📅 Укажите желаемую дату доставки (необязательно).\n\nВыберите дату на календаре."
+            await message.answer(text, reply_markup=cal_kb)
+            await _save_outgoing(user.id, text, cal_kb)
             return
 
         # First message after showing keyboard — show address history or ask for address
+        # Check if callback already sent the calendar (race condition fix)
+        fsm_data = await state.get_data()
+        if fsm_data.get("_address_callback_sent"):
+            # Callback already sent the calendar, don't send duplicate
+            return
+
         prev_addresses = await get_previous_addresses(db_session, user.id)
         if prev_addresses:
             await state.update_data(prev_addresses=prev_addresses, _address_sent=True)
@@ -160,6 +226,11 @@ async def process_address(message: Message, state: FSMContext, db_session, user)
 
 @order_router.callback_query(lambda c: c.data and '"t":"addr"' in c.data and 'custom_' not in c.data)
 async def cb_address(callback: CallbackQuery, state: FSMContext, db_session, user):
+    # Only handle if user is in order flow
+    current_state = await state.get_state()
+    if current_state != OrderForm.waiting_for_address.state:
+        return
+
     data = unpack_cb(callback.data)
     action = data.get("action", "")
 
@@ -176,9 +247,36 @@ async def cb_address(callback: CallbackQuery, state: FSMContext, db_session, use
         if address:
             await state.update_data(address=address, _address_sent=False)
             await state.set_state(OrderForm.waiting_for_date)
-            text = "📅 Введите дату доставки (необязательно):\n\nФормат: ДД.ММ.ГГГГ, ДД.ММ.ГГ или ДД.ММ, например: 15.11.2026, 15.11.26, 15.11"
-            await callback.message.answer(text)
-            await _save_outgoing(user.id, text)
+            # Delete the address selection message (keyboard)
+            await callback.message.delete()
+            # Confirm selected address
+            confirm_text = f"📍 Вы выбрали адрес доставки: {address}"
+            await callback.message.answer(confirm_text)
+            await _save_outgoing(user.id, confirm_text)
+            # Compute min_date from cart lead times
+            fsm_data = await state.get_data()
+            cart = fsm_data.get("cart", {})
+            max_lead_days = await get_max_lead_days(db_session, cart)
+            min_date = date.today() + timedelta(days=max_lead_days)
+            today = date.today()
+            await state.update_data(cal_year=today.year, cal_month=today.month, min_delivery_days=max_lead_days)
+            cal_kb = get_calendar_keyboard(year=today.year, month=today.month, min_date=min_date)
+            info_msg = ""
+            if max_lead_days > 0:
+                lead_products = []
+                for prod_id_str, qty in cart.items():
+                    pid = int(prod_id_str)
+                    result = await db_session.execute(select(Product).where(Product.id == pid))
+                    p = result.scalar_one_or_none()
+                    if p and p.min_delivery_days and p.min_delivery_days >= max_lead_days:
+                        lead_products.append(f"«{p.name}» ({p.min_delivery_days} дн.)")
+                if lead_products:
+                    info_msg = f"⏰ Товары {', '.join(lead_products)} требуют доставки не ранее чем через {max_lead_days} дн.\n\n"
+            text = info_msg + "📅 Укажите желаемую дату доставки (необязательно).\n\nВыберите дату на календаре."
+            # Set flag to prevent duplicate calendar send from message handler (race condition fix)
+            await state.update_data(_address_callback_sent=True)
+            await callback.message.answer(text, reply_markup=cal_kb)
+            await _save_outgoing(user.id, text, cal_kb)
         else:
             await callback.answer("Ошибка", show_alert=True)
     elif action == "new":
@@ -188,6 +286,87 @@ async def cb_address(callback: CallbackQuery, state: FSMContext, db_session, use
         await callback.message.answer(text)
         await _save_outgoing(user.id, text)
         return
+
+    await callback.answer()
+
+
+@order_router.callback_query(lambda c: c.data and '"t":"cal"' in c.data)
+async def cb_calendar(callback: CallbackQuery, state: FSMContext, db_session, user):
+    # Only handle if user is in order flow
+    current_state = await state.get_state()
+    if current_state not in (OrderForm.waiting_for_date.state,):
+        return
+
+    data = unpack_cb(callback.data)
+    action = data.get("action", "")
+
+    if action == "select_date":
+        fsm_data = await state.get_data()
+        cal_year = fsm_data.get("cal_year", date.today().year)
+        cal_month = fsm_data.get("cal_month", date.today().month)
+
+        cal_year = int(data.get("y", cal_year))
+        cal_month = int(data.get("m", cal_month))
+        d = int(data.get("d", 1))
+        selected_date = date(cal_year, cal_month, d)
+        delivery_date_str = format_date_display(selected_date)
+        await state.update_data(
+            date=delivery_date_str,
+            cal_year=cal_year,
+            cal_month=cal_month
+        )
+
+        # Transition to time selection state
+        await state.set_state(OrderForm.waiting_for_time)
+
+        # Delete the old calendar message and show time keyboard
+        await callback.message.delete()
+
+        time_kb = get_time_keyboard()
+        text = f"✅ Вы выбрали дату: {delivery_date_str}\n\n🕐 Выберите время доставки:"
+        await callback.message.answer(text, reply_markup=time_kb)
+        await _save_outgoing(user.id, text, time_kb)
+
+    elif action == "skip":
+        await state.update_data(date=None)
+        await state.set_state(OrderForm.waiting_for_time)
+        await callback.message.delete()
+        time_kb = get_time_keyboard()
+        text = "✅ Дата не выбрана.\n\n🕐 Выберите время доставки:"
+        await callback.message.answer(text, reply_markup=time_kb)
+        await _save_outgoing(user.id, text, time_kb)
+
+    elif action in ("prev_month", "next_month"):
+        fsm_data = await state.get_data()
+        cal_year = fsm_data.get("cal_year", date.today().year)
+        cal_month = fsm_data.get("cal_month", date.today().month)
+
+        if action == "prev_month":
+            cal_month -= 1
+            if cal_month < 1:
+                cal_month = 12
+                cal_year -= 1
+        elif action == "next_month":
+            cal_month += 1
+            if cal_month > 12:
+                cal_month = 1
+                cal_year += 1
+
+        await state.update_data(cal_year=cal_year, cal_month=cal_month)
+        # Compute min_date from cart lead times
+        fsm_data = await state.get_data()
+        cart = fsm_data.get("cart", {})
+        max_lead_days = await get_max_lead_days(db_session, cart)
+        min_date = date.today() + timedelta(days=max_lead_days)
+        cal_kb = get_calendar_keyboard(year=cal_year, month=cal_month, min_date=min_date)
+        text = "📅 Укажите желаемую дату доставки (необязательно).\n\nВыберите дату на календаре."
+        await callback.message.edit_text(text=text, reply_markup=cal_kb)
+        await _save_outgoing(user.id, text, cal_kb)
+
+    elif action == "day_name":
+        await callback.answer()
+    else:
+        await callback.answer()
 
     await callback.answer()
 
@@ -210,6 +389,17 @@ async def process_date(message: Message, state: FSMContext, db_session, user):
             return
 
         date_str = message.text.strip()
+
+        # Support skip via text
+        if date_str.lower() == "пропустить":
+            await state.update_data(date=None)
+            await state.set_state(OrderForm.waiting_for_time)
+            time_kb = get_time_keyboard()
+            text = "🕐 Выберите время доставки:\n\nНажмите на удобное время."
+            await message.answer(text, reply_markup=time_kb)
+            await _save_outgoing(user.id, text, time_kb)
+            return
+
         if not re.match(r"^\d{2}\.\d{2}(\.\d{2,4})?$", date_str):
             text = "⚠️ Неверный формат даты.\n\nФормат: ДД.ММ.ГГГГ или ДД.ММ.ГГ или ДД.ММ, например: 15.11.2026, 15.11.26, 15.11"
             await message.answer(text)
@@ -230,14 +420,96 @@ async def process_date(message: Message, state: FSMContext, db_session, user):
             await _save_outgoing(user.id, text)
             return
 
+        # Validate date is not before min_date (lead time)
+        data = await state.get_data()
+        cart = data.get("cart", {})
+        max_lead_days = await get_max_lead_days(db_session, cart)
+        min_date = date.today() + timedelta(days=max_lead_days)
+        if validated_date < min_date:
+            text = f"⚠️ Дата {validated_date.strftime('%d.%m.%Y')} недоступна. Минимальная дата доставки: {min_date.strftime('%d.%m.%Y')}."
+            await message.answer(text)
+            await _save_outgoing(user.id, text)
+            return
+
         await state.update_data(date=date_str)
         await state.set_state(OrderForm.waiting_for_time)
-        text = "🕐 Введите время доставки в формате ЧЧ:ММ:\n\nНапример: 14:00"
-        await message.answer(text)
-        await _save_outgoing(user.id, text)
+        # Confirm selected date and show time selection in one message
+        text = f"✅ Вы выбрали дату: {date_str}\n\n🕐 Выберите время доставки:\n\nНажмите на удобное время."
+        time_kb = get_time_keyboard()
+        await message.answer(text, reply_markup=time_kb)
+        await _save_outgoing(user.id, text, time_kb)
     except Exception as e:
         logger.error(f"Error in process_date: {e}", exc_info=True)
         await message.answer("❌ Произошла ошибка. Попробуйте ещё раз или начните заново с /start")
+
+
+@order_router.callback_query(lambda c: c.data and '"t":"time"' in c.data)
+async def cb_time(callback: CallbackQuery, state: FSMContext, db_session, user):
+    # Only handle if user is in order flow
+    current_state = await state.get_state()
+    if current_state not in (OrderForm.waiting_for_time.state,):
+        return
+
+    data = unpack_cb(callback.data)
+    action = data.get("action", "")
+
+    if action == "select":
+        time_str = data.get("time")
+        await state.update_data(time=time_str)
+        await callback.message.delete()
+
+        # Confirm selected time
+        time_confirmation = f"✅ Вы выбрали время: {time_str}"
+        await callback.message.answer(time_confirmation)
+        await _save_outgoing(user.id, time_confirmation)
+
+        # Get previous phones for user
+        prev_phones = await get_previous_phones(db_session, user.id)
+        if prev_phones:
+            await state.update_data(prev_phones=prev_phones)
+            await state.set_state(OrderForm.waiting_for_phone)
+            text = "📞 Выберите номер или введите новый:"
+            keyboard = get_phone_history_keyboard(prev_phones)
+            # Set flag to prevent duplicate from message handler (race condition fix)
+            await state.update_data(_time_callback_sent=True)
+            await callback.message.answer(text, reply_markup=keyboard)
+            await _save_outgoing(user.id, text, keyboard)
+        else:
+            await state.set_state(OrderForm.waiting_for_phone)
+            text = "📞 Введите номер телефона для связи:\n\nНапример: +7 (996) 041-22-27"
+            await callback.message.answer(text)
+            await _save_outgoing(user.id, text)
+
+    elif action == "skip":
+        await state.update_data(time=None)
+        await callback.message.delete()
+
+        # Confirm time was skipped
+        time_confirmation = "✅ Время не выбрано."
+        await callback.message.answer(time_confirmation)
+        await _save_outgoing(user.id, time_confirmation)
+
+        # Get previous phones for user
+        prev_phones = await get_previous_phones(db_session, user.id)
+        if prev_phones:
+            await state.update_data(prev_phones=prev_phones)
+            await state.set_state(OrderForm.waiting_for_phone)
+            text = "📞 Выберите номер или введите новый:"
+            keyboard = get_phone_history_keyboard(prev_phones)
+            # Set flag to prevent duplicate from message handler (race condition fix)
+            await state.update_data(_time_callback_sent=True)
+            await callback.message.answer(text, reply_markup=keyboard)
+            await _save_outgoing(user.id, text, keyboard)
+        else:
+            await state.set_state(OrderForm.waiting_for_phone)
+            text = "📞 Введите номер телефона для связи:\n\nНапример: +7 (996) 041-22-27"
+            await callback.message.answer(text)
+            await _save_outgoing(user.id, text)
+
+    else:
+        await callback.answer()
+
+    await callback.answer()
 
 
 @order_router.message(OrderForm.waiting_for_time)
@@ -257,9 +529,43 @@ async def process_time(message: Message, state: FSMContext, db_session, user):
             await _save_outgoing(user.id, "❌ Заказ отменён.")
             return
 
+        # Guard against duplicate messages
+        data = await state.get_data()
+        if data.get("_time_sent"):
+            return
+        await state.update_data(_time_sent=True)
+
         time_str = message.text.strip()
 
+        # Validate time format if not skip
+        if time_str.lower() == "пропустить":
+            time_str = None
+        elif time_str:
+            if not re.match(r"^\d{2}:\d{2}$", time_str):
+                await state.update_data(_time_sent=False)
+                time_kb = get_time_keyboard()
+                text = "⚠️ Неверный формат времени.\n\nФормат: ЧЧ:ММ, например: 14:00"
+                await message.answer(text, reply_markup=time_kb)
+                await _save_outgoing(user.id, text)
+                return
+            try:
+                hour, minute = map(int, time_str.split(":"))
+                if not (0 <= hour <= 23 and 0 <= minute <= 59):
+                    raise ValueError
+            except ValueError:
+                await state.update_data(_time_sent=False)
+                time_kb = get_time_keyboard()
+                text = "⚠️ Такое время не существует. Проверьте часы и минуты."
+                await message.answer(text, reply_markup=time_kb)
+                await _save_outgoing(user.id, text)
+                return
+
         await state.update_data(time=time_str)
+
+        # Check if callback already sent the phone prompt (race condition fix)
+        fsm_data = await state.get_data()
+        if fsm_data.get("_time_callback_sent"):
+            return
 
         # Запрашиваем предыдущие телефоны и показываем клавиатуру
         prev_phones = await get_previous_phones(db_session, user.id)
@@ -283,6 +589,11 @@ async def process_time(message: Message, state: FSMContext, db_session, user):
 
 @order_router.callback_query(lambda c: c.data and '"t":"phone"' in c.data and 'custom_' not in c.data)
 async def cb_phone(callback: CallbackQuery, state: FSMContext, db_session, user):
+    # Only handle if user is in order flow
+    current_state = await state.get_state()
+    if current_state not in (OrderForm.waiting_for_phone.state,):
+        return
+
     data = unpack_cb(callback.data)
     action = data.get("action", "")
 
@@ -299,6 +610,13 @@ async def cb_phone(callback: CallbackQuery, state: FSMContext, db_session, user)
         if phone:
             await state.update_data(phone=phone, _phone_sent=False)
             await state.set_state(OrderForm.waiting_for_comment)
+            # Delete the phone selection message (keyboard)
+            await callback.message.delete()
+            # Confirm selected phone with date (time already shown)
+            date_str = fsm_data.get("date") or "не указана"
+            confirm_text = f"📞 Вы выбрали номер: {phone}\n\n📅 Дата доставки: {date_str}"
+            await callback.message.answer(confirm_text)
+            await _save_outgoing(user.id, confirm_text)
             text = "💬 Добавьте комментарий к заказу (необязательно):\n\nНапример: позвонить за час, код домофона 123"
             await callback.message.answer(text)
             await _save_outgoing(user.id, text)
@@ -345,6 +663,11 @@ async def process_phone(message: Message, state: FSMContext, db_session, user):
                 chose_new_phone=False,
             )
             await state.set_state(OrderForm.waiting_for_comment)
+            # Confirm selected phone with date (time already shown)
+            date_str = data.get("date") or "не указана"
+            confirm_text = f"📞 Вы выбрали номер: {message.text.strip()}\n\n📅 Дата доставки: {date_str}"
+            await message.answer(confirm_text)
+            await _save_outgoing(user.id, confirm_text)
             text = "💬 Добавьте комментарий к заказу (необязательно):\n\nНапример: позвонить за час, код домофона 123"
             await message.answer(text)
             await _save_outgoing(user.id, text)
@@ -368,6 +691,11 @@ async def process_phone(message: Message, state: FSMContext, db_session, user):
 
         await state.update_data(phone=phone)
         await state.set_state(OrderForm.waiting_for_comment)
+        # Confirm selected phone with date (time already shown)
+        date_str = data.get("date") or "не указана"
+        confirm_text = f"📞 Вы выбрали номер: {phone}\n\n📅 Дата доставки: {date_str}"
+        await message.answer(confirm_text)
+        await _save_outgoing(user.id, confirm_text)
         text = "💬 Добавьте комментарий к заказу (необязательно):\n\nНапример: позвонить за час, код домофона 123"
         await message.answer(text)
         await _save_outgoing(user.id, text)
@@ -396,7 +724,7 @@ async def process_comment(message: Message, state: FSMContext, db_session, user,
         data = await state.get_data()
         address = data.get("address")
         date_str = data.get("date")
-        time_str = data.get("time")
+        time_str = data.get("time") or ""
         phone = data.get("phone")
         comment = message.text if message.text and message.text.lower() != "готово" else ""
 
@@ -488,17 +816,26 @@ async def process_comment(message: Message, state: FSMContext, db_session, user,
 
         await state.clear()
 
+        # Lead time info
+        max_lead_days = data.get("min_delivery_days", 0)
+        if max_lead_days > 0:
+            min_date = date.today() + timedelta(days=max_lead_days)
+            lead_info = f"\n⏰ Минимальная дата доставки: {min_date.strftime('%d.%m.%Y')} ({max_lead_days} дн.)"
+        else:
+            lead_info = ""
+
         order_text = (
             f"✅ Заказ #{order.id} оформлен!\n\n"
             f"💰 Сумма: {total:.0f} ₽\n\n"
-            f"📋 Состав:\n" + "\n".join(order_items_text) +
-            f"\n\n📍 Доставка: {address}\n"
+            f"📋 Состав:\n" + ("\n".join(order_items_text) if order_items_text else "  —") +
+            f"\n\n📍 Доставка: {address if address else 'не указана'}\n"
             f"📅 Дата: {date_str if date_str else 'не указана'}\n"
-            f"🕐 Время: {time_str}\n"
+            f"🕐 Время: {time_str if time_str else 'не указано'}\n"
             f"📞 Телефон: {phone}"
         )
         if comment:
             order_text += f"\n💬 Комментарий: {comment}"
+        order_text += lead_info
 
         order_text += "\n\n🌸 Спасибо за заказ! Мы свяжемся с вами для подтверждения."
 

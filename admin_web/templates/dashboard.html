@@ -44,7 +44,7 @@
                 <td>{{ (order.delivery_date.strftime('%d.%m.%Y') if order.delivery_date else '—') + (' ' + order.delivery_time.strftime('%H:%M') if order.delivery_date and order.delivery_time else '') }}</td>
                 <td>{{ "%.0f"|format(order.total_price) }} ₽</td>
                 <td><span class="badge badge-{{ order.status }}">{{ status_labels.get(order.status, order.status) if status_labels else order.status }}</span></td>
-                <td>{{ order.delivery_address[:30] }}...</td>
+                <td>{{ (order.delivery_address[:30] + '...') if order.delivery_address else '—' }}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -55,6 +55,12 @@
             <input type="number" id="quantity" name="quantity" value="{{ product.quantity if product else 0 }}" min="0" required>
         </div>
 
+        <div class="form-group">
+            <label for="min_delivery_days">Минимум за X дней до доставки</label>
+            <input type="number" id="min_delivery_days" name="min_delivery_days" value="{{ product.min_delivery_days if product else 0 }}" min="0" max="30" required>
+            <small style="color: var(--text-light);">Укажите, за сколько дней до доставки нужно заказать товар (0 = без ограничений)</small>
+        </div>
+
         {% if product %}
         <div class="form-group">
             <label>

@@ -31,6 +31,7 @@ class Product(Base):
     image_url = Column(String(500), nullable=True)
     is_active = Column(Boolean, default=True)
     quantity = Column(Integer, default=0, nullable=False)
+    min_delivery_days = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now())
 
     category = relationship("Category", back_populates="products")

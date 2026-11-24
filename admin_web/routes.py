@@ -407,6 +407,7 @@ async def product_add_submit(
     category_id: int = FastAPIForm(...),
     composition: str = FastAPIForm(""),
     quantity: int = FastAPIForm(0),
+    min_delivery_days: int = FastAPIForm(0),
     image_url: str = FastAPIForm(""),
     images: str = FastAPIForm(""),
 ):
@@ -419,6 +420,7 @@ async def product_add_submit(
             category_id=category_id,
             composition=composition,
             quantity=quantity,
+            min_delivery_days=min_delivery_days,
             is_active=quantity > 0,
             image_url=image_url if image_url else None,
         )
@@ -470,6 +472,7 @@ async def product_edit_submit(
     composition: str = FastAPIForm(""),
     is_active: bool = FastAPIForm(True),
     quantity: int = FastAPIForm(0),
+    min_delivery_days: int = FastAPIForm(0),
     image_url: str = FastAPIForm(""),
     images: str = FastAPIForm(""),
 ):
@@ -486,6 +489,7 @@ async def product_edit_submit(
         product.category_id = category_id
         product.composition = composition
         product.quantity = quantity
+        product.min_delivery_days = min_delivery_days
         product.is_active = is_active and quantity > 0
         if image_url:
             product.image_url = image_url

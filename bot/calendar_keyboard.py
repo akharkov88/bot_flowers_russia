@@ -16,33 +16,29 @@ _MONTH_NAMES = [
     "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь",
 ]
 
-# Default time slots (every 30 min from 09:00 to 21:00)
-_DEFAULT_TIME_SLOTS = [
-    "09:00", "09:30",
-    "10:00", "10:30",
-    "11:00", "11:30",
-    "12:00", "12:30",
-    "13:00", "13:30",
-    "14:00", "14:30",
-    "15:00", "15:30",
-    "16:00", "16:30",
-    "17:00", "17:30",
-    "18:00", "18:30",
-    "19:00", "19:30",
-    "20:00", "20:30",
-    "21:00",
-]
+# Default time slots (every 30 min, 24/7)
+def _generate_time_slots():
+    """Generate 30-minute slots for a full 24-hour day (00:00–23:30)."""
+    slots = []
+    for hour in range(24):
+        slots.append(f"{hour:02d}:00")
+        slots.append(f"{hour:02d}:30")
+    return slots
+
+_DEFAULT_TIME_SLOTS = _generate_time_slots()
 
 
 def get_time_keyboard(
     selected_time: str = None,
     available_slots: list = None,
+    prefix: str = "",
 ) -> InlineKeyboardMarkup:
     """Generate an inline keyboard with time slot buttons.
 
     Args:
         selected_time: Currently selected time (if any)
         available_slots: List of available time slots (default: 09:00-21:00)
+        prefix: Prefix for callback data type to avoid router conflicts
 
     Returns:
         InlineKeyboardMarkup with time buttons
@@ -55,7 +51,7 @@ def get_time_keyboard(
     keyboard.append([
         InlineKeyboardButton(
             text="🕐 Выберите время доставки",
-            callback_data=pack_cb(type="time", action="header"),
+            callback_data=pack_cb(type=f"{prefix}time", action="header"),
         )
     ])
 
@@ -69,19 +65,9 @@ def get_time_keyboard(
                 symbol = slot
             row.append(InlineKeyboardButton(
                 text=symbol,
-                callback_data=pack_cb(type="time", action="select", tm=slot),
+                callback_data=pack_cb(type=f"{prefix}time", action="select", tm=slot),
             ))
         keyboard.append(row)
-
-    # Skip row
-    keyboard.append([
-        InlineKeyboardButton(text="⏩ Пропустить", callback_data=pack_cb(type="time", action="skip")),
-    ])
-
-    # Custom time input button
-    keyboard.append([
-        InlineKeyboardButton(text="✏️ Ввести своё время", callback_data=pack_cb(type="time", action="custom")),
-    ])
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
@@ -97,7 +83,7 @@ def get_calendar_keyboard(
     selected_date: date = None,
     min_date: date = None,
     max_date: date = None,
-    hide_cancel: bool = False,
+    prefix: str = "",
 ) -> InlineKeyboardMarkup:
     """Generate an inline calendar keyboard for a given year/month.
 
@@ -107,7 +93,7 @@ def get_calendar_keyboard(
         selected_date: Currently selected date (if any)
         min_date: Minimum selectable date (disabled before this)
         max_date: Maximum selectable date (disabled after this)
-        hide_cancel: If True, skip the cancel button row
+        prefix: Prefix for callback data type to avoid router conflicts
 
     Returns:
         InlineKeyboardMarkup with calendar buttons
@@ -126,13 +112,13 @@ def get_calendar_keyboard(
     keyboard.append([
         InlineKeyboardButton(
             text=f"{month_name} {year}",
-            callback_data=pack_cb(type="cal", action="header"),
+            callback_data=pack_cb(type=f"{prefix}cal", action="header"),
         )
     ])
 
     # Day names row
     keyboard.append([
-        InlineKeyboardButton(text=name, callback_data=pack_cb(type="cal", action="day_name"))
+        InlineKeyboardButton(text=name, callback_data=pack_cb(type=f"{prefix}cal", action="day_name"))
         for name in _DAY_NAMES
     ])
 
@@ -180,7 +166,7 @@ def get_calendar_keyboard(
             buttons.append(InlineKeyboardButton(
                 text=symbol,
                 callback_data=pack_cb(
-                    type="cal",
+                    type=f"{prefix}cal",
                     action="select_date",
                     y=current.year,
                     m=current.month,
@@ -192,19 +178,9 @@ def get_calendar_keyboard(
 
     # Navigation row
     keyboard.append([
-        InlineKeyboardButton(text="⬅️ Пред", callback_data=pack_cb(type="cal", action="prev_month")),
-        InlineKeyboardButton(text="След ➡️", callback_data=pack_cb(type="cal", action="next_month")),
+        InlineKeyboardButton(text="⬅️ Пред", callback_data=pack_cb(type=f"{prefix}cal", action="prev_month")),
+        InlineKeyboardButton(text="След ➡️", callback_data=pack_cb(type=f"{prefix}cal", action="next_month")),
     ])
-
-    # Skip / Cancel row
-    if hide_cancel:
-        keyboard.append([
-            InlineKeyboardButton(text="⏩ Пропустить", callback_data=pack_cb(type="cal", action="skip")),
-        ])
-    else:
-        keyboard.append([
-            InlineKeyboardButton(text="❌ Отмена", callback_data=pack_cb(type="cal", action="cancel")),
-        ])
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
 

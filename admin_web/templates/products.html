@@ -13,6 +13,7 @@
                 <th>Название</th>
                 <th>Цена</th>
                 <th>Кол-во</th>
+                <th>Лид-тайм</th>
                 <th>Категория</th>
                 <th>Статус</th>
                 <th>Действия</th>
@@ -29,6 +30,13 @@
                         <span style="color: green;">{{ product.quantity }}</span>
                     {% elif product.quantity == 0 %}
                         <span style="color: red;">0</span>
+                    {% else %}
+                        <span style="color: gray;">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if product.min_delivery_days and product.min_delivery_days > 0 %}
+                        <span style="color: orange;">{{ product.min_delivery_days }} дн.</span>
                     {% else %}
                         <span style="color: gray;">—</span>
                     {% endif %}
