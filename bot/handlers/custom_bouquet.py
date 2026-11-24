@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import date, time
+from datetime import date, time, timedelta, datetime
 
 from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery
@@ -11,6 +11,7 @@ from bot.handlers.admin import notify_admin
 from bot.keyboards import get_main_keyboard, get_custom_bouquet_keyboard, get_address_history_keyboard, get_phone_history_keyboard, pack_cb, unpack_cb, _short_hash
 from bot.models import Order, User
 from bot.states import CustomBouquetForm, NavigationState
+from bot.calendar_keyboard import get_calendar_keyboard, format_date_display, get_time_keyboard
 from bot.utils.logger import logger
 from bot.utils.message_saver import save_outgoing_with_keyboard
 from bot.database import async_session_factory
@@ -218,14 +219,19 @@ async def process_budget(message: Message, state: FSMContext, db_session, user):
 
     await state.update_data(budget=budget)
     await state.set_state(CustomBouquetForm.waiting_for_delivery_date)
-    text = "📅 Укажите желаемую дату доставки (необязательно).\n\nФормат: ДД.ММ.ГГГГ, ДД.ММ.ГГ или ДД.ММ, например: 20.11.2026, 20.11.26, 20.11"
-    await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+    # Initialize calendar month/year if not set
+    fsm_data = await state.get_data()
+    cal_year = fsm_data.get("cal_year", date.today().year)
+    cal_month = fsm_data.get("cal_month", date.today().month)
+    await state.update_data(cal_year=cal_year, cal_month=cal_month)
+    cal_kb = get_calendar_keyboard(year=cal_year, month=cal_month, hide_cancel=True)
+    text = "📅 Укажите желаемую дату доставки (необязательно).\n\nВыберите дату на календаре или нажмите ⏩ Пропустить."
+    await message.answer(text, reply_markup=cal_kb)
     await _save_outgoing(user.id, text)
 
 
 @custom_bouquet_router.message(CustomBouquetForm.waiting_for_delivery_date)
 async def process_delivery_date(message: Message, state: FSMContext, db_session, user):
-    logger.info(f"DEBUG process_delivery_date: user_id={user.id}, text={repr(message.text[:50])}, current_state={await state.get_state()}")
     # Cancel on menu buttons
     if message.text in _MENU_BUTTONS:
         await state.clear()
@@ -238,6 +244,7 @@ async def process_delivery_date(message: Message, state: FSMContext, db_session,
         await _save_outgoing(user.id, "❌ Отменено.")
         return
 
+    # Also support manual text input as fallback
     if message.text and message.text.lower() == "пропустить":
         delivery_date = None
         delivery_date_str = None
@@ -255,7 +262,7 @@ async def process_delivery_date(message: Message, state: FSMContext, db_session,
             if year and year < 100:
                 year += 2000
             current_year = date.today().year
-            delivery_date = date(year or current_year, month, day)  # use current year as fallback
+            delivery_date = date(year or current_year, month, day)
             delivery_date_str = date_str
         except ValueError:
             text = "⚠️ Такая дата не существует. Проверьте день и месяц."
@@ -265,14 +272,80 @@ async def process_delivery_date(message: Message, state: FSMContext, db_session,
 
     await state.update_data(delivery_date=delivery_date, delivery_date_str=delivery_date_str)
     await state.set_state(CustomBouquetForm.waiting_for_time)
-    text = "🕐 Введите время доставки в формате ЧЧ:ММ:\n\nНапример: 14:00"
-    await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+    time_kb = get_time_keyboard()
+    text = "🕐 Выберите время доставки:\n\nНажмите на удобное время или введите своё (например: 14:00)."
+    await message.answer(text, reply_markup=time_kb)
     await _save_outgoing(user.id, text)
+
+
+@custom_bouquet_router.callback_query(F.data.startswith('{"t":"cal"'))
+async def cb_custom_calendar(callback: CallbackQuery, state: FSMContext, db_session):
+    data = unpack_cb(callback.data)
+    action = data.get("action", "")
+
+    if action in ("select_date", "prev_month", "next_month", "header"):
+        # Calendar navigation / selection
+        fsm_data = await state.get_data()
+        cal_year = fsm_data.get("cal_year", date.today().year)
+        cal_month = fsm_data.get("cal_month", date.today().month)
+        selected_date = fsm_data.get("delivery_date")
+
+        if action == "select_date":
+            cal_year = data.get("y", cal_year)
+            cal_month = data.get("m", cal_month)
+            d = data.get("d", 1)
+            selected_date = date(cal_year, cal_month, d)
+            delivery_date_str = format_date_display(selected_date)
+            await state.update_data(delivery_date=selected_date, delivery_date_str=delivery_date_str, cal_year=cal_year, cal_month=cal_month)
+
+            # Transition to time selection state
+            await state.set_state(CustomBouquetForm.waiting_for_time)
+
+            # Delete the old calendar message and show time keyboard
+            await callback.message.delete()
+
+            text = f"✅ Выбрана дата: {delivery_date_str}\n\n🕐 Выберите время доставки:"
+            time_kb = get_time_keyboard()
+            await callback.message.answer(text, reply_markup=time_kb)
+            await _save_outgoing(callback.from_user.id, text, time_kb)
+
+        elif action == "skip":
+            await state.update_data(delivery_date=None, delivery_date_str=None)
+            await state.set_state(CustomBouquetForm.waiting_for_time)
+            await callback.message.delete()
+            text = "🕐 Выберите время доставки:"
+            time_kb = get_time_keyboard()
+            await callback.message.answer(text, reply_markup=time_kb)
+            await _save_outgoing(callback.from_user.id, text, time_kb)
+
+        else:
+            # prev_month or next_month
+            if action == "prev_month":
+                cal_month -= 1
+                if cal_month < 1:
+                    cal_month = 12
+                    cal_year -= 1
+            elif action == "next_month":
+                cal_month += 1
+                if cal_month > 12:
+                    cal_month = 1
+                    cal_year += 1
+
+            await state.update_data(cal_year=cal_year, cal_month=cal_month)
+            cal_kb = get_calendar_keyboard(year=cal_year, month=cal_month, hide_cancel=True)
+            text = "📅 Укажите желаемую дату доставки (необязательно).\n\nВыберите дату на календаре или нажмите ⏩ Пропустить."
+            await callback.message.edit_text(text=text, reply_markup=cal_kb)
+
+    elif action == "day_name":
+        await callback.answer()
+    else:
+        await callback.answer()
+
+    await callback.answer()
 
 
 @custom_bouquet_router.message(CustomBouquetForm.waiting_for_time)
 async def process_time(message: Message, state: FSMContext, db_session, user):
-    logger.info(f"DEBUG process_time: user_id={user.id}, text={repr(message.text[:50])}, current_state={await state.get_state()}")
     # Cancel on menu buttons
     if message.text in _MENU_BUTTONS:
         await state.clear()
@@ -333,6 +406,60 @@ async def process_time(message: Message, state: FSMContext, db_session, user):
         text = "📍 Введите адрес доставки:\n\nНапример: г. Нижний Новгород, ул. Белинского, д. 10, кв. 5"
         await message.answer(text, reply_markup=get_custom_bouquet_keyboard())
         await _save_outgoing(user.id, text)
+
+
+async def _send_address_prompt(callback, state, db_session, time_str=None):
+    """Send time confirmation and prompt for address."""
+    if time_str:
+        text = "✅ Время: " + time_str + "\n\n📍 Выберите адрес или введите новый:"
+    else:
+        text = "📍 Выберите адрес или введите новый:"
+    keyboard = get_custom_bouquet_keyboard()
+    await callback.message.answer(text, reply_markup=keyboard)
+    await _save_outgoing(callback.from_user.id, text)
+
+    # Запрашиваем предыдущие адреса
+    prev_addresses = await _get_prev_addresses(db_session, callback.from_user.id)
+    if prev_addresses:
+        await state.update_data(prev_addresses=prev_addresses, _address_sent=True)
+        await state.set_state(CustomBouquetForm.waiting_for_address)
+        text = "📍 Выберите адрес или введите новый:"
+        keyboard = get_address_history_keyboard(prev_addresses, prefix="custom_")
+        await callback.message.answer(text, reply_markup=keyboard)
+        await _save_outgoing(callback.from_user.id, text, keyboard)
+    else:
+        await state.update_data(_address_sent=True)
+        await state.set_state(CustomBouquetForm.waiting_for_address)
+        text = "📍 Введите адрес доставки:\n\nНапример: г. Нижний Новгород, ул. Белинского, д. 10, кв. 5"
+        await callback.message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+        await _save_outgoing(callback.from_user.id, text)
+
+
+@custom_bouquet_router.callback_query(F.data.startswith('{"t":"time"'))
+async def cb_custom_time(callback: CallbackQuery, state: FSMContext, db_session):
+    data = unpack_cb(callback.data)
+    action = data.get("action", "")
+
+    if action == "select":
+        time_str = data.get("tm")
+        await state.update_data(time=time_str)
+        await callback.message.delete()
+        await _send_address_prompt(callback, state, db_session, time_str)
+
+    elif action == "skip":
+        await state.update_data(time=None)
+        await callback.message.delete()
+        await _send_address_prompt(callback, state, db_session)
+
+    elif action == "custom":
+        # User wants to enter custom time
+        await callback.message.delete()
+        text = "✏️ Введите своё время в формате ЧЧ:ММ:\n\nНапример: 14:00"
+        await callback.message.answer(text, reply_markup=get_custom_bouquet_keyboard())
+        await _save_outgoing(callback.from_user.id, text)
+
+    else:
+        await callback.answer()
 
 
 @custom_bouquet_router.message(CustomBouquetForm.waiting_for_address)
