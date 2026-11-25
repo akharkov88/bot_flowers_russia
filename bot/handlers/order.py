@@ -309,6 +309,18 @@ async def cb_calendar(callback: CallbackQuery, state: FSMContext, db_session, us
         cal_month = int(data.get("m", cal_month))
         d = int(data.get("d", 1))
         selected_date = date(cal_year, cal_month, d)
+
+        # Validate date is not before min_date (lead time)
+        cart = fsm_data.get("cart", {})
+        max_lead_days = await get_max_lead_days(db_session, cart)
+        min_date = date.today() + timedelta(days=max_lead_days)
+        if selected_date < min_date:
+            await callback.answer(
+                f"⚠️ Дата {selected_date.strftime('%d.%m.%Y')} недоступна. Минимальная дата: {min_date.strftime('%d.%m.%Y')}",
+                show_alert=True,
+            )
+            return
+
         delivery_date_str = format_date_display(selected_date)
         await state.update_data(
             date=delivery_date_str,

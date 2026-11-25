@@ -305,6 +305,16 @@ async def cb_custom_calendar(callback: CallbackQuery, state: FSMContext, db_sess
             cal_month = data.get("m", cal_month)
             d = data.get("d", 1)
             selected_date = date(cal_year, cal_month, d)
+
+            # Validate date is not in the past
+            min_date = date.today()
+            if selected_date < min_date:
+                await callback.answer(
+                    f"⚠️ Дата {selected_date.strftime('%d.%m.%Y')} недоступна. Минимальная дата: {min_date.strftime('%d.%m.%Y')}",
+                    show_alert=True,
+                )
+                return
+
             delivery_date_str = format_date_display(selected_date)
             await state.update_data(delivery_date=selected_date, delivery_date_str=delivery_date_str, delivery_date_obj=selected_date, cal_year=cal_year, cal_month=cal_month)
 
