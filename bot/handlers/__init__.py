@@ -11,10 +11,10 @@ from bot.handlers.custom_bouquet import custom_bouquet_router
 
 def register_handlers(dp: Dispatcher):
     dp.include_routers(
-        custom_bouquet_router,
-        order_router,
         catalog_router,
         cart_router,
+        order_router,
+        custom_bouquet_router,
         admin_router,
         user_orders_router,
         start_router,

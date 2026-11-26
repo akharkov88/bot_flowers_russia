@@ -110,6 +110,19 @@ async def cmd_custom_bouquet(message: Message, state: FSMContext, db_session, us
 
 @custom_bouquet_router.callback_query(F.data.startswith('{"t":"back"'))
 async def cb_custom_back(callback: CallbackQuery, state: FSMContext, db_session, bot: Bot):
+    # Only handle back button if user is in custom bouquet flow
+    current_state = await state.get_state()
+    if current_state not in (
+        CustomBouquetForm.waiting_for_description.state,
+        CustomBouquetForm.waiting_for_budget.state,
+        CustomBouquetForm.waiting_for_delivery_date.state,
+        CustomBouquetForm.waiting_for_address.state,
+        CustomBouquetForm.waiting_for_phone.state,
+        CustomBouquetForm.waiting_for_comment.state,
+    ):
+        # Not in custom bouquet flow — don't handle this callback
+        return
+
     data = unpack_cb(callback.data)
     back_context = data.get("back_context", "main")
     cat_id = int(data.get("cat_id", 0))
