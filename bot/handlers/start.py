@@ -2,7 +2,8 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from bot.keyboards import get_main_keyboard
+from bot.keyboards import get_main_keyboard, get_contacts_keyboard
+from bot.config import settings
 from bot.utils.logger import logger
 
 start_router = Router()
@@ -27,7 +28,7 @@ async def msg_contacts(message: Message):
     contacts_text = (
         "📍 Контакты:\n\n"
         "🏠 Адрес: Вятская д.7, Нижний Новгород\n\n"
-        "📞 Телефон: +7 (996) 041-22-27\n\n"
+        f"📞 Телефон: {settings.store_phone_display}\n\n"
         "🕐 Время работы:\n"
         "Пн-Пт: 9:00 - 21:00\n"
         "Сб-Вс: 9:00 - 21:00\n\n"
@@ -36,3 +37,15 @@ async def msg_contacts(message: Message):
     )
 
     await message.answer(contacts_text, reply_markup=get_main_keyboard())
+
+
+@start_router.message(F.text == "📞 Позвонить")
+async def msg_call(message: Message):
+    # Telegram автоматически делает номер телефона кликабельным на мобильных устройствах
+    # При нажатии откроется набор номера через сотового оператора
+    call_text = (
+        f"📞 Позвоните нам:\n\n"
+        f"{settings.store_phone}\n\n"
+        f"Нажмите на номер, чтобы позвонить через сотового оператора"
+    )
+    await message.answer(call_text, reply_markup=get_main_keyboard())

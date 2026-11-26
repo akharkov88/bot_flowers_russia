@@ -145,10 +145,14 @@ async def msg_cart(message: Message, state: FSMContext, db_session):
     await message.answer("\n".join(lines), reply_markup=get_cart_keyboard(cart_for_kb, total))
 
 
-@cart_router.callback_query(F.data.startswith('{"t":"cart"'))
+@cart_router.callback_query(lambda c: c.data and '"t":"cart"' in c.data)
 async def cb_cart_action(callback: CallbackQuery, bot: Bot, state: FSMContext, db_session):
     data = unpack_cb(callback.data)
     action = data.get("action")
+
+    # Only handle cart-specific actions; let other handlers process cart callbacks
+    if action not in ("add", "plus", "minus", "checkout"):
+        return
 
     if action == "add":
         prod_id = int(data["product_id"])
@@ -310,22 +314,5 @@ async def cb_cart_action(callback: CallbackQuery, bot: Bot, state: FSMContext, d
             await _save_outgoing(user.id, text)
 
 
-@cart_router.callback_query(F.data.startswith('{"t":"back"'))
-async def cb_back(callback: CallbackQuery, db_session, state: FSMContext):
-    data = unpack_cb(callback.data)
-    back_to = data.get("back_to", "main")
-
-    if back_to == "catalog":
-        cart_ctx = await get_cart_back_context(state)
-        if cart_ctx["cat_id"] > 0:
-            from bot.handlers.catalog import restore_category_products
-            from aiogram import Bot
-            # Get bot from callback
-            bot = callback.bot
-            await restore_category_products(callback, bot, db_session, state, cart_ctx["cat_id"])
-            await callback.answer()
-            return
-
-    # Default: main menu
-    await callback.message.answer("🌸 Выберите раздел:", reply_markup=get_main_keyboard())
-    await callback.answer()
+# NOTE: "Назад" из корзины обрабатывается через cart_back_context в catalog_router.cb_handle_back
+# Не добавляем отдельный handler для back в cart_router — это блокирует catalog_router

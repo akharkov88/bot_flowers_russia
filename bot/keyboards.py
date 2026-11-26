@@ -45,6 +45,8 @@ def get_main_keyboard() -> ReplyKeyboardMarkup:
         keyboard=[
             [KeyboardButton(text="🌸 Каталог"), KeyboardButton(text="🛒 Корзина")],
             [KeyboardButton(text="📋 Мои заказы"), KeyboardButton(text="📍 Контакты")],
+            [KeyboardButton(text="📞 Позвонить")],
+            [KeyboardButton(text="🌸 Все товары")],
             [KeyboardButton(text="✨ Хочу букет которого нет в каталоге")],
         ],
         resize_keyboard=True,
@@ -134,7 +136,7 @@ def get_admin_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="📦 Товары", callback_data=pack_cb(type="admin", action="products", id=0, page="0"))],
         [InlineKeyboardButton(text="📋 Заказы", callback_data=pack_cb(type="admin", action="orders", id=0, page="0"))],
         [InlineKeyboardButton(text="📊 Статистика", callback_data=pack_cb(type="admin", action="stats", id=0, page="0"))],
-        [InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="back", action="back", id=0, page="0"))],
+        [InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="admin", action="back", id=0, page="0"))],
     ])
 
 
@@ -152,7 +154,7 @@ def get_admin_products_keyboard(products: list, page: int = 0) -> InlineKeyboard
         InlineKeyboardButton(text="➕ Добавить товар", callback_data=pack_cb(type="admin", action="add_product", id=0, page=str(page))),
     ])
     builder.inline_keyboard.append([
-        InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="back", action="back", id=0, page="0")),
+        InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="admin", action="back", id=0, page=str(page))),
     ])
     return builder
 
@@ -169,7 +171,7 @@ def get_admin_orders_keyboard(orders: list, page: int = 0) -> InlineKeyboardMark
             )
         ])
     builder.inline_keyboard.append([
-        InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="back", action="back", id=0, page="0")),
+        InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="admin", action="back", id=0, page=str(page))),
     ])
     return builder
 
@@ -188,7 +190,7 @@ def get_admin_order_status_keyboard(order) -> InlineKeyboardMarkup:
             text=text,
             callback_data=pack_cb(type="admin", action="update_status", id=order.id, page=status)
         )])
-    rows.append([InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="back", action="back", id=0, page="0"))])
+    rows.append([InlineKeyboardButton(text="⬅️ Назад", callback_data=pack_cb(type="admin", action="back", id=order.id, page="0"))])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
@@ -223,6 +225,11 @@ def get_address_history_keyboard(addresses: List[str], prefix: str = "") -> Inli
         InlineKeyboardButton(text="➕ Ввести новый адрес", callback_data=pack_cb(type=f"{prefix}addr", action="new"))
     ])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_contacts_keyboard(phone: str = "") -> InlineKeyboardMarkup:
+    """Клавиатура для контактов — возвращает пустую inline-клавиатуру"""
+    return InlineKeyboardMarkup(inline_keyboard=[])
 
 
 def get_phone_history_keyboard(phones: List[str], prefix: str = "") -> InlineKeyboardMarkup:

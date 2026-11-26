@@ -15,8 +15,8 @@ def register_handlers(dp: Dispatcher):
         order_router,
         catalog_router,
         cart_router,
-        user_orders_router,
         admin_router,
+        user_orders_router,
         start_router,
     )
     print("✅ All routers registered")

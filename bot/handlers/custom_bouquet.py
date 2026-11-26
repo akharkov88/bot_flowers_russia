@@ -11,6 +11,7 @@ from bot.handlers.admin import notify_admin
 from bot.keyboards import get_main_keyboard, get_custom_bouquet_keyboard, get_address_history_keyboard, get_phone_history_keyboard, pack_cb, unpack_cb, _short_hash
 from bot.models import Order, User
 from bot.states import CustomBouquetForm, NavigationState
+from bot.handlers.navigation import peek_previous_navigation, SCREEN_PRODUCTS, SCREEN_CATEGORIES
 from bot.calendar_keyboard import get_calendar_keyboard, format_date_display, get_time_keyboard
 from bot.utils.logger import logger
 from bot.utils.message_saver import save_outgoing_with_keyboard
@@ -113,59 +114,63 @@ async def cb_custom_back(callback: CallbackQuery, state: FSMContext, db_session,
     back_context = data.get("back_context", "main")
     cat_id = int(data.get("cat_id", 0))
 
+    # Сначала пробуем использовать стек навигации
+    prev = await peek_previous_navigation(state)
+    if prev and back_context == "catalog":
+        prev_screen = prev.get("screen", "")
+        prev_cat_id = prev.get("cat_id", 0)
+
+        if prev_screen == SCREEN_PRODUCTS and prev_cat_id > 0:
+            # Возвращаемся к продуктам категории
+            from bot.handlers.catalog import get_image_path
+            from aiogram.types import FSInputFile
+            from aiogram.exceptions import TelegramForbiddenError
+            from bot.models import Product, Category
+            from bot.keyboards import get_products_keyboard
+
+            result = await db_session.execute(
+                select(Product).options(selectinload(Product.images)).where(
+                    Product.category_id == prev_cat_id, Product.is_active == True, Product.quantity > 0
+                ).order_by(Product.id)
+            )
+            products = result.scalars().all()
+            if products:
+                result = await db_session.execute(select(Category).where(Category.id == prev_cat_id))
+                category = result.scalar_one_or_none()
+                if category:
+                    await callback.message.delete()
+                    caption = f"🌸 {category.name}\n\nВыберите букет:"
+                    keyboard = get_products_keyboard(products, cat_id=prev_cat_id)
+
+                    if category.image_url:
+                        cat_image_path = get_image_path(category.image_url)
+                        if cat_image_path and os.path.exists(cat_image_path):
+                            try:
+                                await bot.send_photo(
+                                    callback.message.chat.id,
+                                    FSInputFile(cat_image_path),
+                                    caption=caption,
+                                    reply_markup=keyboard,
+                                )
+                            except (TelegramForbiddenError, Exception):
+                                await bot.send_message(
+                                    callback.message.chat.id,
+                                    caption,
+                                    reply_markup=keyboard,
+                                )
+                        else:
+                            await bot.send_message(callback.message.chat.id, caption, reply_markup=keyboard)
+                    else:
+                        await bot.send_message(callback.message.chat.id, caption, reply_markup=keyboard)
+
+                    await state.clear()
+                    await callback.answer()
+                    return
+
     # Очищаем FSM state
     await state.clear()
 
-    if back_context == "catalog" and cat_id > 0:
-        # Возвращаемся к продуктам категории
-        from bot.handlers.catalog import _get_categories_with_available_products, get_image_path, UPLOAD_DIR
-        from aiogram.types import FSInputFile
-        from aiogram.exceptions import TelegramForbiddenError
-        from sqlalchemy.orm import selectinload
-        from bot.models import Product, Category
-        from bot.keyboards import get_products_keyboard
-
-        result = await db_session.execute(
-            select(Product).options(selectinload(Product.images)).where(Product.category_id == cat_id, Product.is_active == True, Product.quantity > 0).order_by(Product.id)
-        )
-        products = result.scalars().all()
-        if products:
-            result = await db_session.execute(select(Category).where(Category.id == cat_id))
-            category = result.scalar_one_or_none()
-            if category:
-                await callback.message.delete()
-                if category.image_url:
-                    cat_image_path = get_image_path(category.image_url)
-                    if cat_image_path and os.path.exists(cat_image_path):
-                        try:
-                            await bot.send_photo(
-                                callback.message.chat.id,
-                                FSInputFile(cat_image_path),
-                                caption=f"🌸 {category.name}\n\nВыберите букет:",
-                                reply_markup=get_products_keyboard(products, cat_id=cat_id),
-                            )
-                        except (TelegramForbiddenError, Exception):
-                            await bot.send_message(
-                                callback.message.chat.id,
-                                f"🌸 {category.name}\n\nВыберите букет:",
-                                reply_markup=get_products_keyboard(products, cat_id=cat_id),
-                            )
-                    else:
-                        await bot.send_message(
-                            callback.message.chat.id,
-                            f"🌸 {category.name}\n\nВыберите букет:",
-                            reply_markup=get_products_keyboard(products, cat_id=cat_id),
-                        )
-                else:
-                    await bot.send_message(
-                        callback.message.chat.id,
-                        f"🌸 {category.name}\n\nВыберите букет:",
-                        reply_markup=get_products_keyboard(products, cat_id=cat_id),
-                    )
-                await callback.answer()
-                return
-
-    # Fallback — главное меню
+    # Fallback — главное меню (используем answer, так как get_main_keyboard возвращает ReplyKeyboardMarkup)
     await callback.message.answer("🌸 Выберите раздел:", reply_markup=get_main_keyboard())
     await callback.answer()
 

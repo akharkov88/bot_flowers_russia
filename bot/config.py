@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     web_admin_password: str = "admin123"
     web_admin_host: str = "0.0.0.0"
     web_admin_port: int = 8000
+    store_phone: str = "+79960412227"
+    store_phone_display: str = "+7 (996) 041-22-27"
     
     # Proxy configuration (optional)
     proxy_host: str = ""
