@@ -28,10 +28,10 @@ async def msg_contacts(message: Message):
     contacts_text = (
         "📍 Контакты:\n\n"
         "🏠 Адрес: Вятская д.7, Нижний Новгород\n\n"
-        f"📞 Телефон: {settings.store_phone_display}\n\n"
+        f"📞 Телефон: {settings.store_phone}\n\n"
         "🕐 Время работы:\n"
-        "Пн-Пт: 9:00 - 21:00\n"
-        "Сб-Вс: 9:00 - 21:00\n\n"
+        "Пн-Вс: 9:00 - 21:00\n"
+        "Доставка по предварительному заказу круглосуточно\n"
         "📧 Email: tsvety-porusski@yandex.ru\n\n"
         "Выберите раздел:"
     )
