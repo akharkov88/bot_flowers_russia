@@ -674,9 +674,6 @@ async def process_phone(message: Message, state: FSMContext, db_session, user):
         # Guard against duplicate messages
         if data.get("_phone_sent"):
             return
-        # If time callback already sent the phone prompt, don't duplicate
-        if data.get("_time_callback_sent"):
-            return
         await state.update_data(_phone_sent=True)
 
         if data.get("chose_new_phone"):
