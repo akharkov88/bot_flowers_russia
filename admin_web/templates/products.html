@@ -10,6 +10,7 @@
         <thead>
             <tr>
                 <th>№</th>
+                <th>Фото</th>
                 <th>Название</th>
                 <th>Цена</th>
                 <th>Кол-во</th>
@@ -23,6 +24,20 @@
             {% for product in products %}
             <tr>
                 <td>{{ product.id }}</td>
+                <td>
+                    {% if product.image_url or product.images %}
+                        {% if product.image_url %}
+                            <img src="{{ product.image_url }}?t={{ product.id }}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" title="Главное фото">
+                        {% else %}
+                            <img src="{{ product.images[0].image_url }}?t={{ product.id }}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" title="Фото 1">
+                        {% endif %}
+                        {% if product.images|length > 1 %}
+                            <span style="font-size:11px;color:var(--text-light);margin-left:4px;">+{{ product.images|length - 1 }}</span>
+                        {% endif %}
+                    {% else %}
+                        <span style="color: #e74c3c;font-size:18px;" title="Нет фото">📷</span>
+                    {% endif %}
+                </td>
                 <td>{{ product.name }}</td>
                 <td>{{ "%.0f"|format(product.price) }} ₽</td>
                 <td>

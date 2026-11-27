@@ -33,6 +33,7 @@
             <tr>
                 <th>Статус</th>
                 <th>Количество</th>
+                <th>Выручка</th>
             </tr>
         </thead>
         <tbody>
@@ -40,8 +41,14 @@
             <tr>
                 <td><span class="badge badge-{{ status }}">{{ status_labels.get(status, status) }}</span></td>
                 <td>{{ count }}</td>
+                <td>{{ "%.0f"|format(status_revenue.get(status, 0)) }} ₽</td>
             </tr>
             {% endfor %}
+            <tr style="font-weight:bold;border-top:2px solid var(--primary);">
+                <td>Итого</td>
+                <td>{{ total_orders }}</td>
+                <td>{{ "%.0f"|format(total_revenue) }} ₽</td>
+            </tr>
         </tbody>
     </table>
 </div>

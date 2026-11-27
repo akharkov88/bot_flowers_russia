@@ -277,14 +277,14 @@ async def products_page(request: Request):
     async with async_session_factory() as session:
         result = await session.execute(
             select(Product)
-            .options(joinedload(Product.category))
+            .options(joinedload(Product.category), joinedload(Product.images))
             .order_by(Product.id)
         )
         products = result.unique().scalars().all()
     return HTMLResponse(content=render_template("products.html", {
         "request": request,
         "products": products,
-    }))
+    }), headers={"Cache-Control": "no-store, no-cache, must-revalidate"})
 
 
 @router.get("/products/add", response_class=HTMLResponse)
@@ -382,19 +382,26 @@ async def delete_product_image(product_id: int, image_id: int, request: Request)
         return RedirectResponse(url="/login", status_code=307)
 
     async with async_session_factory() as session:
+        result = await session.execute(select(Product).where(Product.id == product_id))
+        product = result.scalar_one_or_none()
+
         result = await session.execute(select(ProductImage).where(ProductImage.id == image_id, ProductImage.product_id == product_id))
         product_image = result.scalar_one_or_none()
-        
+
         if product_image:
             # Delete file from disk
             filename = os.path.basename(product_image.image_url)
             filepath = os.path.join(UPLOAD_DIR, filename)
             if os.path.exists(filepath):
                 os.remove(filepath)
-            
+
+            # If this image is the main image_url, clear it
+            if product and product.image_url == product_image.image_url:
+                product.image_url = None
+
             await session.delete(product_image)
             await session.commit()
-    
+
     return RedirectResponse(url=f"/products/{product_id}/edit", status_code=302)
 
 
@@ -491,18 +498,16 @@ async def product_edit_submit(
         product.quantity = quantity
         product.min_delivery_days = min_delivery_days
         product.is_active = is_active and quantity > 0
-        if image_url:
-            product.image_url = image_url
 
         # Save additional images from pendingImages (only new ones)
         if images:
             image_list = json.loads(images)
-            
+
             # Get existing image URLs for this product
             result = await session.execute(select(ProductImage).where(ProductImage.product_id == product_id))
             existing_images = result.scalars().all()
             existing_urls = {img.image_url for img in existing_images}
-            
+
             # Only add images that don't already exist
             for order, img_url in enumerate(image_list):
                 if img_url not in existing_urls:
@@ -511,6 +516,14 @@ async def product_edit_submit(
                         image_url=img_url,
                         order=order,
                     ))
+
+            # Sync main image_url with first image
+            product.image_url = image_list[0]
+        elif image_url:
+            product.image_url = image_url
+        else:
+            # No new images and no image_url — user deleted the main image
+            product.image_url = None
 
         await session.commit()
     response = RedirectResponse(url="/products", status_code=302)
@@ -844,14 +857,19 @@ async def stats_page(request: Request):
         result = await session.execute(select(func.count(Order.id)))
         total_orders = result.scalar() or 0
 
-        result = await session.execute(select(func.sum(Order.total_price)))
+        result = await session.execute(
+            select(func.sum(Order.total_price))
+            .where(Order.status == "delivered")
+        )
         total_revenue = result.scalar() or 0
 
         result = await session.execute(
-            select(Order.status, func.count(Order.id))
+            select(Order.status, func.count(Order.id), func.sum(Order.total_price))
             .group_by(Order.status)
         )
-        status_counts = {row[0]: row[1] for row in result.all()}
+        status_data = {row[0]: {"count": row[1], "revenue": row[2] or 0} for row in result.all()}
+        status_counts = {status: data["count"] for status, data in status_data.items()}
+        status_revenue = {status: data["revenue"] for status, data in status_data.items()}
 
         result = await session.execute(select(func.count(User.id)))
         total_users = result.scalar() or 0
@@ -890,6 +908,7 @@ async def stats_page(request: Request):
         "total_orders": total_orders,
         "total_revenue": total_revenue,
         "status_counts": status_counts,
+        "status_revenue": status_revenue,
         "total_users": total_users,
         "active_products": active_products,
         "status_labels": status_labels,
